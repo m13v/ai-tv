@@ -62,13 +62,6 @@ export default function Chat({
     return () => window.removeEventListener("keydown", handler);
   }, []);
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      onSubmit();
-    }
-  };
-
   return (
     <div className="flex flex-col h-full">
       {/* Messages */}
