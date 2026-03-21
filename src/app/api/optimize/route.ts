@@ -7,7 +7,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "query is required" }, { status: 400 });
   }
 
-  const apiKey = process.env.GEMINI_API_KEY;
+  const apiKey = process.env.GOOGLE_GEMINI_API_KEY;
   if (!apiKey) {
     // Fall back to original query if no key
     return NextResponse.json({ searchQuery: query });
@@ -15,22 +15,32 @@ export async function POST(req: NextRequest) {
 
   try {
     const res = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          system_instruction: {
-            parts: [
-              {
-                text: "You are a YouTube Shorts search query optimizer. Given a user's request, output the single best YouTube search query to find relevant short-form videos. Output ONLY the search query text, nothing else. Keep it concise (3-6 words). Optimize for finding engaging, popular Shorts.",
-              },
-            ],
-          },
-          contents: [{ parts: [{ text: query }] }],
+          contents: [
+            {
+              parts: [
+                {
+                  text: `Convert this user request into a YouTube search query (2-5 words) that will find the best matching Shorts videos. Output ONLY the search query, nothing else.
+
+Examples:
+- "I want to learn about space exploration" → "space exploration facts shorts"
+- "show me something relaxing" → "satisfying relaxing videos"
+- "hi" → "trending viral shorts"
+- "funny animals" → "funny animals compilation"
+
+User request: ${query}`,
+                },
+              ],
+            },
+          ],
           generationConfig: {
             temperature: 0.3,
-            maxOutputTokens: 64,
+            maxOutputTokens: 32,
+            thinkingConfig: { thinkingBudget: 0 },
           },
         }),
       }
