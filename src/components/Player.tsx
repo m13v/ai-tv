@@ -48,6 +48,7 @@ interface YTPlayer {
 export default function Player({ videoIds }: PlayerProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [muted, setMuted] = useState(true);
+  const mutedRef = useRef(true);
   const playerRef = useRef<YTPlayer | null>(null);
   const currentIndexRef = useRef(0);
   const videoIdsRef = useRef(videoIds);
@@ -87,7 +88,9 @@ export default function Player({ videoIds }: PlayerProps) {
       } else {
         playerRef.current.mute();
       }
-      setMuted(!muted);
+      const newMuted = !muted;
+      setMuted(newMuted);
+      mutedRef.current = newMuted;
     }
   }, [muted]);
 
@@ -201,15 +204,21 @@ export default function Player({ videoIds }: PlayerProps) {
           loop: 0,
           fs: 0,
           iv_load_policy: 3,
-          mute: 1,
+          mute: mutedRef.current ? 1 : 0,
         },
         events: {
           onStateChange: onPlayerStateChange,
+          onReady: () => {
+            if (!mutedRef.current && playerRef.current) {
+              playerRef.current.unMute();
+              playerRef.current.setVolume(100);
+            }
+          },
         },
       });
       currentIndexRef.current = 0;
       setCurrentIndex(0);
-      setMuted(true);
+      setMuted(mutedRef.current);
     };
 
     if (apiReadyRef.current && window.YT) {
