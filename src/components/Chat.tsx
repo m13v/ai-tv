@@ -13,6 +13,8 @@ interface ChatProps {
   onInputChange: (value: string) => void;
   onSubmit: () => void;
   loading: boolean;
+  suggestedReplies?: string[];
+  onQuickReply?: (reply: string) => void;
 }
 
 export default function Chat({
@@ -21,6 +23,8 @@ export default function Chat({
   onInputChange,
   onSubmit,
   loading,
+  suggestedReplies,
+  onQuickReply,
 }: ChatProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -90,6 +94,21 @@ export default function Chat({
         )}
         <div ref={messagesEndRef} />
       </div>
+
+      {/* Suggested replies */}
+      {suggestedReplies && suggestedReplies.length > 0 && !loading && (
+        <div className="px-4 pb-2 flex flex-wrap gap-2">
+          {suggestedReplies.map((reply, i) => (
+            <button
+              key={i}
+              onClick={() => onQuickReply?.(reply)}
+              className="bg-neutral-800 hover:bg-neutral-700 text-white text-sm px-3 py-1.5 rounded-full border border-neutral-700 hover:border-neutral-500 transition-colors"
+            >
+              {reply}
+            </button>
+          ))}
+        </div>
+      )}
 
       {/* Input */}
       <div className="border-t border-neutral-800 px-4 py-3">
