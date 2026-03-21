@@ -111,8 +111,8 @@ export default function Home() {
   // Chat + Video side by side
   return (
     <main className="h-screen w-screen bg-black flex">
-      {/* Left: Chat */}
-      <div className="w-[400px] min-w-[350px] h-full border-r border-neutral-800 flex flex-col">
+      {/* Left: Chat — 50% */}
+      <div className="w-1/2 h-full border-r border-neutral-800 flex flex-col">
         <Chat
           messages={messages}
           input={input}
@@ -122,8 +122,8 @@ export default function Home() {
         />
       </div>
 
-      {/* Right: Video */}
-      <div className="flex-1 h-full">
+      {/* Right: Video — 50% */}
+      <div className="w-1/2 h-full">
         {videoIds.length > 0 ? (
           <Player videoIds={videoIds} />
         ) : (

@@ -21,3 +21,12 @@ html, body {
   width: 100% !important;
   height: 100% !important;
 }
+
+@keyframes fade-out {
+  0%, 70% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+.animate-fade-out {
+  animation: fade-out 4s ease-out forwards;
+}
