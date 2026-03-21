@@ -22,6 +22,8 @@ interface ChatProps {
   watchingVideo?: boolean;
   overlay?: boolean;
   showMessages?: boolean;
+  showControls?: boolean;
+  onTapBackground?: () => void;
 }
 
 export default function Chat({
@@ -37,6 +39,8 @@ export default function Chat({
   watchingVideo,
   overlay,
   showMessages = true,
+  showControls = true,
+  onTapBackground,
 }: ChatProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -68,8 +72,11 @@ export default function Chat({
 
   return (
     <div className={`flex flex-col h-full ${overlay ? "pointer-events-none" : ""}`}>
-      {/* Messages */}
-      <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4">
+      {/* Messages — tappable in overlay mode to toggle controls */}
+      <div
+        className={`flex-1 overflow-y-auto px-4 py-4 space-y-4 ${overlay ? "pointer-events-auto" : ""}`}
+        onClick={overlay ? onTapBackground : undefined}
+      >
         {showMessages && (
           <>
             {messages.map((msg, i) => (
@@ -128,83 +135,92 @@ export default function Chat({
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Suggested replies */}
-      {suggestedReplies && suggestedReplies.length > 0 && !loading && (
-        <div className={`px-4 pb-2 flex gap-2 overflow-x-auto md:flex-wrap md:overflow-x-visible scrollbar-none ${overlay ? "pointer-events-auto" : ""}`}>
-          {suggestedReplies.map((reply, i) => (
-            <button
-              key={i}
-              onClick={() => onQuickReply?.(reply)}
-              className={`text-white text-sm px-3 py-1.5 rounded-full transition-colors whitespace-nowrap shrink-0 ${
-                overlay
-                  ? "bg-black/50 backdrop-blur-md border border-white/20 hover:bg-black/70"
-                  : "bg-neutral-800 hover:bg-neutral-700 border border-neutral-700 hover:border-neutral-500"
-              }`}
-            >
-              {reply}
-            </button>
-          ))}
-        </div>
-      )}
-
-      {/* Model toggle + Input */}
-      <div className={`px-4 py-3 ${overlay ? "pointer-events-auto border-t border-transparent" : "border-t border-neutral-800"}`}>
-        <div className="flex items-center gap-1 mb-2">
-          <span className="text-[10px] text-neutral-500 mr-1">Model:</span>
-          {(["gemini-flash-latest", "gemini-pro-latest"] as const).map((m) => (
-            <button
-              key={m}
-              type="button"
-              onClick={() => onModelChange(m)}
-              className={`text-[11px] px-2 py-0.5 rounded-full transition-colors ${
-                model === m
-                  ? "bg-white/15 text-white border border-white/20"
-                  : "text-neutral-500 hover:text-neutral-300 border border-transparent"
-              }`}
-            >
-              {m === "gemini-flash-latest" ? "Flash" : "Pro"}
-            </button>
-          ))}
-        </div>
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            onSubmit();
-          }}
-          className="flex gap-2"
-        >
-          <div className="relative flex-1">
-            <input
-              ref={inputRef}
-              type="text"
-              value={input}
-              onChange={(e) => onInputChange(e.target.value)}
-              placeholder="Ask something or describe what to watch next..."
-              className={`w-full rounded-full px-4 py-2.5 pr-16 text-white placeholder-neutral-400 focus:outline-none text-sm text-[16px] md:text-sm ${
-                overlay
-                  ? "bg-black/50 backdrop-blur-md border border-white/20 focus:border-white/40"
-                  : "bg-neutral-900 border border-neutral-700 focus:border-neutral-600"
-              }`}
-              disabled={loading}
-              autoFocus
-            />
-            <div className="absolute right-3 top-1/2 -translate-y-1/2 items-center gap-0.5 pointer-events-none hidden md:flex">
-              <kbd className="text-[10px] text-white/50 bg-white/8 border border-white/10 rounded px-1 py-0.5 font-mono">
-                &#8984;
-              </kbd>
-              <kbd className="text-[10px] text-white/50 bg-white/8 border border-white/10 rounded px-1 py-0.5 font-mono">
-                K
-              </kbd>
-            </div>
+      {/* Bottom controls: suggested replies + input — slides down when hidden */}
+      <div className={`transition-all duration-300 ease-in-out ${
+        overlay && !showControls
+          ? "translate-y-full opacity-0 pointer-events-none"
+          : overlay
+            ? "translate-y-0 opacity-100 pointer-events-auto"
+            : ""
+      }`}>
+        {/* Suggested replies */}
+        {suggestedReplies && suggestedReplies.length > 0 && !loading && (
+          <div className="px-4 pb-2 flex gap-2 overflow-x-auto md:flex-wrap md:overflow-x-visible scrollbar-none">
+            {suggestedReplies.map((reply, i) => (
+              <button
+                key={i}
+                onClick={() => onQuickReply?.(reply)}
+                className={`text-white text-sm px-3 py-1.5 rounded-full transition-colors whitespace-nowrap shrink-0 ${
+                  overlay
+                    ? "bg-black/50 backdrop-blur-md border border-white/20 hover:bg-black/70"
+                    : "bg-neutral-800 hover:bg-neutral-700 border border-neutral-700 hover:border-neutral-500"
+                }`}
+              >
+                {reply}
+              </button>
+            ))}
           </div>
-          <button
-            type="submit"
-            disabled={loading || !input.trim()}
-            className="bg-white text-black font-medium px-4 py-2.5 rounded-full hover:bg-neutral-200 disabled:opacity-30 disabled:cursor-not-allowed transition-colors text-sm"
+        )}
+
+        {/* Model toggle + Input */}
+        <div className={`px-4 py-3 ${overlay ? "pb-6 border-t border-transparent" : "border-t border-neutral-800"}`}>
+          <div className="flex items-center gap-1 mb-2">
+            <span className="text-[10px] text-neutral-500 mr-1">Model:</span>
+            {(["gemini-flash-latest", "gemini-pro-latest"] as const).map((m) => (
+              <button
+                key={m}
+                type="button"
+                onClick={() => onModelChange(m)}
+                className={`text-[11px] px-2 py-0.5 rounded-full transition-colors ${
+                  model === m
+                    ? "bg-white/15 text-white border border-white/20"
+                    : "text-neutral-500 hover:text-neutral-300 border border-transparent"
+                }`}
+              >
+                {m === "gemini-flash-latest" ? "Flash" : "Pro"}
+              </button>
+            ))}
+          </div>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              onSubmit();
+            }}
+            className="flex gap-2"
           >
-            Send
-          </button>
-        </form>
+            <div className="relative flex-1">
+              <input
+                ref={inputRef}
+                type="text"
+                value={input}
+                onChange={(e) => onInputChange(e.target.value)}
+                placeholder="Ask something or describe what to watch next..."
+                className={`w-full rounded-full px-4 py-2.5 pr-16 text-white placeholder-neutral-400 focus:outline-none text-sm text-[16px] md:text-sm ${
+                  overlay
+                    ? "bg-black/50 backdrop-blur-md border border-white/20 focus:border-white/40"
+                    : "bg-neutral-900 border border-neutral-700 focus:border-neutral-600"
+                }`}
+                disabled={loading}
+                autoFocus
+              />
+              <div className="absolute right-3 top-1/2 -translate-y-1/2 items-center gap-0.5 pointer-events-none hidden md:flex">
+                <kbd className="text-[10px] text-white/50 bg-white/8 border border-white/10 rounded px-1 py-0.5 font-mono">
+                  &#8984;
+                </kbd>
+                <kbd className="text-[10px] text-white/50 bg-white/8 border border-white/10 rounded px-1 py-0.5 font-mono">
+                  K
+                </kbd>
+              </div>
+            </div>
+            <button
+              type="submit"
+              disabled={loading || !input.trim()}
+              className="bg-white text-black font-medium px-4 py-2.5 rounded-full hover:bg-neutral-200 disabled:opacity-30 disabled:cursor-not-allowed transition-colors text-sm"
+            >
+              Send
+            </button>
+          </form>
+        </div>
       </div>
     </div>
   );
