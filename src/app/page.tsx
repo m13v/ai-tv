@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useRef, useEffect } from "react";
 import posthog from "posthog-js";
-import Player from "@/components/Player";
+import Player, { type PlayerHandle } from "@/components/Player";
 import Chat from "@/components/Chat";
 
 interface Message {
@@ -22,7 +22,7 @@ export default function Home() {
   const [mobileOverlay, setMobileOverlay] = useState(true);
   const [showControls, setShowControls] = useState(true);
   const [muted, setMuted] = useState(true);
-  const playerRef = useRef<{ toggleMute: () => void } | null>(null);
+  const playerRef = useRef<PlayerHandle | null>(null);
 
   // Load mobile layout preference
   useEffect(() => {
