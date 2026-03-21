@@ -122,8 +122,8 @@ export default function Chat({
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Bottom: suggested replies + input */}
-      <div className={overlay ? "pointer-events-auto" : ""}>
+      {/* Bottom: suggested replies + input — pushed up on mobile overlay to clear YouTube timeline */}
+      <div className={overlay ? "pointer-events-auto pb-12" : ""}>
         {/* Suggested replies */}
         {suggestedReplies && suggestedReplies.length > 0 && !loading && (
           <div className="px-4 pb-2 flex gap-2 overflow-x-auto md:flex-wrap md:overflow-x-visible scrollbar-none">
@@ -144,7 +144,7 @@ export default function Chat({
         )}
 
         {/* Model toggle + Input */}
-        <div className={`px-4 py-3 ${overlay ? "pb-6 border-t border-transparent" : "border-t border-neutral-800"}`}>
+        <div className={`px-4 py-3 ${overlay ? "border-t border-transparent" : "border-t border-neutral-800"}`}>
           <div className="flex items-center gap-1 mb-2">
             <span className="text-[10px] text-neutral-500 mr-1">Model:</span>
             {(["gemini-flash-latest", "gemini-pro-latest"] as const).map((m) => (
