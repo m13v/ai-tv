@@ -212,18 +212,9 @@ export default function Home() {
 
   // Draggable split
   const [splitPercent, setSplitPercent] = useState(50);
-  const [isMobile, setIsMobile] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const draggingRef = useRef(false);
   const containerRef = useRef<HTMLElement>(null);
-
-  // Track mobile breakpoint
-  useEffect(() => {
-    const check = () => setIsMobile(window.innerWidth < 768);
-    check();
-    window.addEventListener("resize", check);
-    return () => window.removeEventListener("resize", check);
-  }, []);
 
   useEffect(() => {
     const onMove = (clientX: number, clientY: number) => {
@@ -356,15 +347,13 @@ export default function Home() {
   // Mobile: video top (splitPercent%), chat bottom
   // Desktop: chat left (splitPercent%), video right
   return (
-    <main ref={containerRef} className="h-screen w-screen bg-black flex flex-col md:flex-row select-none overflow-hidden">
+    <main
+      ref={containerRef}
+      className="h-screen w-screen bg-black flex flex-col md:flex-row select-none overflow-hidden"
+      style={{ "--split": `${splitPercent}%` } as React.CSSProperties}
+    >
       {/* Video — top on mobile, right on desktop */}
-      <div
-        className="overflow-hidden order-1 md:order-2 min-h-0 min-w-0"
-        style={isMobile
-          ? { height: `calc(${splitPercent}% - 6px)`, width: '100%' }
-          : { width: `calc(${100 - splitPercent}% - 6px)`, height: '100%' }
-        }
-      >
+      <div className="overflow-hidden order-1 md:order-2 min-h-0 min-w-0 split-video">
         {videoIds.length > 0 ? (
           <Player videoIds={videoIds} onVideoChange={handleVideoChange} />
         ) : (
@@ -377,11 +366,9 @@ export default function Home() {
       {/* Drag handle */}
       <div
         className={`group flex items-center justify-center order-2 md:order-2 touch-none transition-all duration-150
-          cursor-row-resize md:cursor-col-resize shrink-0
-          ${isDragging
-            ? "h-3 md:w-3 bg-white/15"
-            : "h-3 md:w-3 hover:bg-white/10"
-          }`}
+          w-full h-3 cursor-row-resize
+          md:w-3 md:h-full md:cursor-col-resize shrink-0
+          ${isDragging ? "bg-white/15" : "hover:bg-white/10"}`}
         onMouseDown={startDrag}
         onTouchStart={startDrag}
       >
@@ -394,13 +381,7 @@ export default function Home() {
       </div>
 
       {/* Chat — bottom on mobile, left on desktop */}
-      <div
-        className="overflow-hidden flex flex-col order-3 md:order-1 min-h-0 min-w-0"
-        style={isMobile
-          ? { height: `calc(${100 - splitPercent}% - 6px)`, width: '100%' }
-          : { width: `calc(${splitPercent}% - 6px)`, height: '100%' }
-        }
-      >
+      <div className="overflow-hidden flex flex-col order-3 md:order-1 min-h-0 min-w-0 split-chat">
         <Chat
           messages={messages}
           input={input}
