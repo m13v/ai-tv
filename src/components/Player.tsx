@@ -59,7 +59,6 @@ export default function Player({ videoIds, onVideoChange }: PlayerProps) {
   // Touch/swipe tracking
   const touchStartRef = useRef<{ x: number; y: number } | null>(null);
   const touchDeltaRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
-  const overlayRef = useRef<HTMLDivElement>(null);
 
   // Wheel debounce
   const lastWheelNavRef = useRef(0);
@@ -121,18 +120,15 @@ export default function Player({ videoIds, onVideoChange }: PlayerProps) {
     return () => window.removeEventListener("keydown", handler);
   }, [next, prev]);
 
-  // Touch: swipe up/down on overlay (iframe eats touch events, so we need an overlay)
+  // Touch: swipe up/down (Instagram-style) — only works outside iframe
   useEffect(() => {
-    const el = overlayRef.current;
+    const el = containerRef.current;
     if (!el) return;
-
-    let isSwiping = false;
 
     const onTouchStart = (e: TouchEvent) => {
       const touch = e.touches[0];
       touchStartRef.current = { x: touch.clientX, y: touch.clientY };
       touchDeltaRef.current = { x: 0, y: 0 };
-      isSwiping = false;
     };
 
     const onTouchMove = (e: TouchEvent) => {
@@ -142,38 +138,18 @@ export default function Player({ videoIds, onVideoChange }: PlayerProps) {
         x: touch.clientX - touchStartRef.current.x,
         y: touch.clientY - touchStartRef.current.y,
       };
-      // Once we detect vertical movement, commit to swipe and prevent scroll
-      if (Math.abs(touchDeltaRef.current.y) > 10) {
-        isSwiping = true;
-        e.preventDefault();
-      }
+      e.preventDefault();
     };
 
-    const onTouchEnd = (e: TouchEvent) => {
+    const onTouchEnd = () => {
       const { y } = touchDeltaRef.current;
       const threshold = 50;
-      if (isSwiping) {
-        if (y < -threshold) next();
-        else if (y > threshold) prev();
-      } else if (touchStartRef.current) {
-        // It was a tap, not a swipe — pass through to iframe
-        const touch = e.changedTouches[0];
-        el.style.pointerEvents = "none";
-        const target = document.elementFromPoint(touch.clientX, touch.clientY);
-        if (target) {
-          target.dispatchEvent(new MouseEvent("click", {
-            bubbles: true,
-            clientX: touch.clientX,
-            clientY: touch.clientY,
-          }));
-        }
-        requestAnimationFrame(() => { el.style.pointerEvents = ""; });
-      }
+      if (y < -threshold) next();
+      else if (y > threshold) prev();
       touchStartRef.current = null;
-      isSwiping = false;
     };
 
-    el.addEventListener("touchstart", onTouchStart, { passive: true });
+    el.addEventListener("touchstart", onTouchStart, { passive: false });
     el.addEventListener("touchmove", onTouchMove, { passive: false });
     el.addEventListener("touchend", onTouchEnd);
 
@@ -277,12 +253,6 @@ export default function Player({ videoIds, onVideoChange }: PlayerProps) {
       {/* Video */}
       <div id="yt-player" className="w-full h-full" />
 
-      {/* Transparent overlay to capture touch swipes (iframe eats touch events) */}
-      <div
-        ref={overlayRef}
-        className="absolute inset-0 z-10 md:hidden"
-        style={{ touchAction: "none" }}
-      />
 
       {/* Big unmute button — center */}
       {muted && (
