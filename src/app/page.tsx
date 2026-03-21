@@ -21,6 +21,8 @@ export default function Home() {
   const [model, setModel] = useState<"gemini-flash-latest" | "gemini-pro-latest">("gemini-flash-latest");
   const [mobileOverlay, setMobileOverlay] = useState(true);
   const [showControls, setShowControls] = useState(true);
+  const [muted, setMuted] = useState(true);
+  const playerRef = useRef<{ toggleMute: () => void } | null>(null);
 
   // Load mobile layout preference
   useEffect(() => {
@@ -402,6 +404,28 @@ export default function Home() {
           </svg>
         </button>
       )}
+      {/* Mobile: mute button — in line with top-left buttons */}
+      {mobileOverlay && showControls && (
+        <button
+          onClick={() => playerRef.current?.toggleMute()}
+          className="absolute top-[calc(0.75rem+env(safe-area-inset-top))] left-[6.25rem] z-30 w-9 h-9 flex items-center justify-center rounded-full bg-black/40 backdrop-blur-sm text-white/60 hover:text-white hover:bg-black/60 transition-all cursor-pointer md:hidden"
+          aria-label={muted ? "Unmute" : "Mute"}
+        >
+          {muted ? (
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+              <line x1="23" y1="9" x2="17" y2="15" />
+              <line x1="17" y1="9" x2="23" y2="15" />
+            </svg>
+          ) : (
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+              <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
+              <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
+            </svg>
+          )}
+        </button>
+      )}
       {/* Mobile: layout toggle in split mode */}
       {!mobileOverlay && (
         <button
@@ -423,7 +447,7 @@ export default function Home() {
           : "overflow-hidden order-1 min-h-0 min-w-0 split-video-mobile"
       }`}>
         {videoIds.length > 0 ? (
-          <Player videoIds={videoIds} onVideoChange={handleVideoChange} hideControls={mobileOverlay && !showControls} />
+          <Player ref={playerRef} videoIds={videoIds} onVideoChange={handleVideoChange} hideControls={mobileOverlay && !showControls} onMuteChange={setMuted} />
         ) : (
           <div className="w-full h-full flex items-center justify-center text-neutral-400">
             Loading video...
