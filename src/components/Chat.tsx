@@ -123,10 +123,10 @@ export default function Chat({
       </div>
 
       {/* Bottom: suggested replies + input — pushed up on mobile overlay to clear YouTube timeline */}
-      <div className={overlay ? "pointer-events-auto pb-16" : ""}>
+      <div className={overlay ? "pb-16" : ""}>
         {/* Suggested replies */}
         {suggestedReplies && suggestedReplies.length > 0 && !loading && (
-          <div className="px-4 pb-2 flex gap-2 overflow-x-auto md:flex-wrap md:overflow-x-visible scrollbar-none">
+          <div className={`px-4 pb-2 flex gap-2 overflow-x-auto md:flex-wrap md:overflow-x-visible scrollbar-none ${overlay ? "pointer-events-auto" : ""}`}>
             {suggestedReplies.map((reply, i) => (
               <button
                 key={i}
@@ -144,7 +144,7 @@ export default function Chat({
         )}
 
         {/* Model toggle + Input */}
-        <div className={`px-4 py-3 ${overlay ? "border-t border-transparent" : "border-t border-neutral-800"}`}>
+        <div className={`px-4 py-3 ${overlay ? "pointer-events-auto border-t border-transparent" : "border-t border-neutral-800"}`}>
           <div className="flex items-center gap-1 mb-2">
             <span className="text-[10px] text-neutral-500 mr-1">Model:</span>
             {(["gemini-flash-latest", "gemini-pro-latest"] as const).map((m) => (
