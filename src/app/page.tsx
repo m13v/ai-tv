@@ -468,13 +468,13 @@ export default function Home() {
             onTapBackground={() => setShowControls((v) => !v)}
           />
         </div>
-        {/* Tap zone to bring overlay back when hidden */}
-        {!showControls && mobileOverlay && (
-          <div
-            className="absolute inset-0 z-20 md:hidden"
-            onClick={() => setShowControls(true)}
-          />
-        )}
+      )}
+      {/* Tap zone to bring overlay back when hidden */}
+      {!showControls && mobileOverlay && (
+        <div
+          className="absolute inset-0 z-20 md:hidden"
+          onClick={() => setShowControls(true)}
+        />
       )}
 
       {/* Mobile split chat */}
