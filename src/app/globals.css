@@ -32,7 +32,17 @@ html, body {
   height: 100% !important;
 }
 
-/* Split layout panels — desktop only, uses --split CSS variable */
+/* Mobile split layout */
+.split-video-mobile {
+  height: var(--split);
+  width: 100%;
+}
+.split-chat-mobile {
+  height: calc(100% - var(--split) - 24px);
+  width: 100%;
+}
+
+/* Desktop split layout */
 @media (min-width: 768px) {
   .split-video-desktop {
     width: calc(100% - var(--split) - 24px);
