@@ -334,9 +334,9 @@ export default function Player({ videoIds, onVideoChange }: PlayerProps) {
         </div>
       )}
 
-      {/* Keyboard hint — bottom center, always visible */}
+      {/* Keyboard hint — bottom center, hidden on mobile */}
       {videoIds.length > 1 && (
-        <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-10 flex items-center gap-2 text-white/60 text-[11px] bg-black/50 backdrop-blur-sm px-3.5 py-2 rounded-full">
+        <div className="hidden md:flex absolute bottom-3 left-1/2 -translate-x-1/2 z-10 items-center gap-2 text-white/60 text-[11px] bg-black/50 backdrop-blur-sm px-3.5 py-2 rounded-full">
           <div className="flex flex-col gap-0.5">
             <kbd className="bg-white/15 border border-white/20 rounded-[4px] px-1.5 py-0.5 font-mono text-[11px] text-white/80 text-center leading-none shadow-[0_2px_0_0_rgba(255,255,255,0.1),inset_0_1px_0_0_rgba(255,255,255,0.1)]">&#8593;</kbd>
             <kbd className="bg-white/15 border border-white/20 rounded-[4px] px-1.5 py-0.5 font-mono text-[11px] text-white/80 text-center leading-none shadow-[0_2px_0_0_rgba(255,255,255,0.1),inset_0_1px_0_0_rgba(255,255,255,0.1)]">&#8595;</kbd>
