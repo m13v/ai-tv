@@ -360,7 +360,10 @@ export default function Home() {
       {/* Video — top on mobile, right on desktop */}
       <div
         className="overflow-hidden order-1 md:order-2 min-h-0 min-w-0"
-        style={{ flex: `0 0 ${isMobile ? splitPercent : 100 - splitPercent}%` }}
+        style={isMobile
+          ? { height: `calc(${splitPercent}% - 6px)`, width: '100%' }
+          : { width: `calc(${100 - splitPercent}% - 6px)`, height: '100%' }
+        }
       >
         {videoIds.length > 0 ? (
           <Player videoIds={videoIds} onVideoChange={handleVideoChange} />
@@ -373,11 +376,11 @@ export default function Home() {
 
       {/* Drag handle */}
       <div
-        className={`group shrink-0 flex items-center justify-center order-2 md:order-2 touch-none transition-all duration-150
-          cursor-row-resize md:cursor-col-resize
+        className={`group flex items-center justify-center order-2 md:order-2 touch-none transition-all duration-150
+          cursor-row-resize md:cursor-col-resize shrink-0
           ${isDragging
-            ? "h-5 md:h-auto md:w-5 bg-white/15"
-            : "h-3 md:h-auto md:w-3 hover:h-5 md:hover:w-5 hover:bg-white/10"
+            ? "h-3 md:w-3 bg-white/15"
+            : "h-3 md:w-3 hover:bg-white/10"
           }`}
         onMouseDown={startDrag}
         onTouchStart={startDrag}
@@ -393,7 +396,10 @@ export default function Home() {
       {/* Chat — bottom on mobile, left on desktop */}
       <div
         className="overflow-hidden flex flex-col order-3 md:order-1 min-h-0 min-w-0"
-        style={{ flex: `0 0 ${isMobile ? 100 - splitPercent : splitPercent}%` }}
+        style={isMobile
+          ? { height: `calc(${100 - splitPercent}% - 6px)`, width: '100%' }
+          : { width: `calc(${splitPercent}% - 6px)`, height: '100%' }
+        }
       >
         <Chat
           messages={messages}
