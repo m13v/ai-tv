@@ -294,26 +294,40 @@ export default function Player({ videoIds }: PlayerProps) {
         </div>
       )}
 
-      {/* Navigation hint */}
-      <NavigationHint />
-    </div>
-  );
-}
+      {/* Up/Down navigation buttons — right side */}
+      {videoIds.length > 1 && (
+        <div className="absolute right-3 top-1/2 -translate-y-1/2 z-10 flex flex-col gap-2">
+          <button
+            onClick={prev}
+            disabled={currentIndex === 0}
+            className="w-10 h-10 flex items-center justify-center rounded-full bg-black/50 backdrop-blur-sm border border-white/15 text-white/60 hover:text-white hover:bg-black/70 disabled:opacity-20 disabled:cursor-default transition-all"
+            aria-label="Previous video"
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="18 15 12 9 6 15" />
+            </svg>
+          </button>
+          <button
+            onClick={next}
+            disabled={currentIndex === videoIds.length - 1}
+            className="w-10 h-10 flex items-center justify-center rounded-full bg-black/50 backdrop-blur-sm border border-white/15 text-white/60 hover:text-white hover:bg-black/70 disabled:opacity-20 disabled:cursor-default transition-all"
+            aria-label="Next video"
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="6 9 12 15 18 9" />
+            </svg>
+          </button>
+        </div>
+      )}
 
-function NavigationHint() {
-  const [visible, setVisible] = useState(true);
-
-  useEffect(() => {
-    const timer = setTimeout(() => setVisible(false), 5000);
-    return () => clearTimeout(timer);
-  }, []);
-
-  if (!visible) return null;
-
-  return (
-    <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 text-white/40 text-xs bg-black/50 backdrop-blur-sm px-4 py-2 rounded-full flex items-center gap-2 animate-fade-out">
-      <span>&#8593; &#8595;</span>
-      <span>next / prev video</span>
+      {/* Keyboard hint — bottom center, always visible */}
+      {videoIds.length > 1 && (
+        <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-10 flex items-center gap-1.5 text-white/30 text-[10px] bg-black/40 backdrop-blur-sm px-3 py-1.5 rounded-full">
+          <kbd className="bg-white/10 border border-white/15 rounded px-1 py-0.5 font-mono text-[10px]">&#8593;</kbd>
+          <kbd className="bg-white/10 border border-white/15 rounded px-1 py-0.5 font-mono text-[10px]">&#8595;</kbd>
+          <span className="ml-0.5">prev / next</span>
+        </div>
+      )}
     </div>
   );
 }
