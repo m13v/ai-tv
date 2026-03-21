@@ -16,6 +16,7 @@ export default function Home() {
   const [videoIds, setVideoIds] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [hasStarted, setHasStarted] = useState(false);
+  const [suggestedReplies, setSuggestedReplies] = useState<string[]>([]);
 
   const sendMessage = useCallback(async () => {
     if (!input.trim() || loading) return;
@@ -29,6 +30,7 @@ export default function Home() {
 
     const isFirstQuery = !hasStarted;
     setHasStarted(true);
+    setSuggestedReplies([]);
 
     // Track user query
     posthog.capture("user_query", {
@@ -100,6 +102,7 @@ export default function Home() {
               reaction,
               matchQuality,
               followUpQuery,
+              suggestedReplies: suggestions,
             } = await reactRes.json();
 
             if (reaction) {
@@ -107,6 +110,9 @@ export default function Home() {
                 ...prev,
                 { role: "assistant", content: reaction },
               ]);
+              if (suggestions?.length > 0) {
+                setSuggestedReplies(suggestions);
+              }
               posthog.capture("video_reaction", {
                 video_id: currentVideoId,
                 match_quality: matchQuality,
@@ -147,6 +153,14 @@ export default function Home() {
       setLoading(false);
     }
   }, [input, messages, loading, hasStarted]);
+
+  const handleQuickReply = useCallback(
+    (reply: string) => {
+      // Set input and trigger send on next tick so state is updated
+      setInput(reply);
+    },
+    []
+  );
 
   // Landing page
   if (!hasStarted) {
@@ -202,6 +216,8 @@ export default function Home() {
           onInputChange={setInput}
           onSubmit={sendMessage}
           loading={loading}
+          suggestedReplies={suggestedReplies}
+          onQuickReply={handleQuickReply}
         />
       </div>
 
