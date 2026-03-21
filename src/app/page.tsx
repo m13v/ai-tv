@@ -308,7 +308,7 @@ export default function Home() {
                   className="w-full bg-neutral-900/80 backdrop-blur border border-neutral-700 rounded-full px-6 py-4 pr-20 text-white placeholder-neutral-400 focus:outline-none focus:border-neutral-500 text-lg"
                   autoFocus
                 />
-                <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-0.5 pointer-events-none">
+                <div className="absolute right-3 top-1/2 -translate-y-1/2 items-center gap-0.5 pointer-events-none hidden md:flex">
                   <kbd className="text-xs text-white/50 bg-white/10 border border-white/15 rounded px-1.5 py-0.5 font-mono">
                     &#8984;
                   </kbd>
