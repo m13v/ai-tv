@@ -77,6 +77,64 @@ export default function Home() {
             search_query: searchQuery,
             video_count: ids.length,
           });
+
+          // Step 3: Have Gemini watch the video and react
+          const currentVideoId = ids[0];
+          const messagesWithAI = [
+            ...updatedMessages,
+            ...(message
+              ? [{ role: "assistant" as const, content: message }]
+              : []),
+          ];
+
+          try {
+            const reactRes = await fetch("/api/react", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                messages: messagesWithAI,
+                videoId: currentVideoId,
+              }),
+            });
+            const {
+              reaction,
+              matchQuality,
+              followUpQuery,
+            } = await reactRes.json();
+
+            if (reaction) {
+              setMessages((prev) => [
+                ...prev,
+                { role: "assistant", content: reaction },
+              ]);
+              posthog.capture("video_reaction", {
+                video_id: currentVideoId,
+                match_quality: matchQuality,
+                search_query: searchQuery,
+              });
+            }
+
+            // If it was a miss, auto-search with the better query
+            if (matchQuality === "miss" && followUpQuery) {
+              const retryRes = await fetch("/api/search", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ query: followUpQuery }),
+              });
+              const { videoIds: retryIds } = await retryRes.json();
+              if (retryIds?.length > 0) {
+                setVideoIds(retryIds);
+                posthog.capture("video_retry", {
+                  original_query: searchQuery,
+                  retry_query: followUpQuery,
+                  video_count: retryIds.length,
+                });
+              }
+            }
+          } catch {
+            // Video reaction is non-critical, don't block the experience
+            console.error("Video reaction failed");
+          }
         }
       }
     } catch {
