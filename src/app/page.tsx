@@ -5,6 +5,8 @@ import posthog from "posthog-js";
 import Player from "@/components/Player";
 import Chat from "@/components/Chat";
 
+type LayoutMode = "split" | "overlay";
+
 interface Message {
   role: "user" | "assistant";
   content: string;
@@ -19,6 +21,22 @@ export default function Home() {
   const [suggestedReplies, setSuggestedReplies] = useState<string[]>([]);
   const [watchingVideo, setWatchingVideo] = useState(false);
   const [model, setModel] = useState<"gemini-flash-latest" | "gemini-pro-latest">("gemini-flash-latest");
+  const [layoutMode, setLayoutMode] = useState<LayoutMode>("overlay");
+  const [chatVisible, setChatVisible] = useState(true);
+
+  // Load layout preference from localStorage
+  useEffect(() => {
+    const saved = localStorage.getItem("layoutMode") as LayoutMode | null;
+    if (saved === "split" || saved === "overlay") setLayoutMode(saved);
+  }, []);
+
+  const toggleLayout = useCallback(() => {
+    setLayoutMode((prev) => {
+      const next = prev === "split" ? "overlay" : "split";
+      localStorage.setItem("layoutMode", next);
+      return next;
+    });
+  }, []);
 
   const sendMessage = useCallback(async (overrideInput?: string) => {
     const raw = overrideInput ?? input;
@@ -343,15 +361,113 @@ export default function Home() {
     );
   }
 
-  // Chat + Video: side by side (desktop) / stacked (mobile)
-  // Mobile: video top (splitPercent%), chat bottom
-  // Desktop: chat left (splitPercent%), video right
+  // Layout mode toggle button (shared between both modes)
+  const layoutToggleButton = (
+    <button
+      onClick={toggleLayout}
+      className="absolute top-3 left-3 z-30 w-9 h-9 flex items-center justify-center rounded-full bg-black/40 backdrop-blur-sm text-white/60 hover:text-white hover:bg-black/60 transition-all cursor-pointer"
+      aria-label={layoutMode === "split" ? "Switch to overlay" : "Switch to split"}
+      title={layoutMode === "split" ? "Overlay mode" : "Split mode"}
+    >
+      {layoutMode === "split" ? (
+        // Overlay icon (layers)
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <rect x="3" y="3" width="18" height="18" rx="2" />
+          <rect x="8" y="8" width="13" height="13" rx="1" />
+        </svg>
+      ) : (
+        // Split icon (columns)
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <rect x="3" y="3" width="18" height="18" rx="2" />
+          <line x1="12" y1="3" x2="12" y2="21" />
+        </svg>
+      )}
+    </button>
+  );
+
+  // ─── OVERLAY MODE ───
+  if (layoutMode === "overlay") {
+    return (
+      <main className="h-screen w-screen bg-black select-none overflow-hidden relative">
+        {/* Video — fullscreen */}
+        <div className="absolute inset-0">
+          {videoIds.length > 0 ? (
+            <Player videoIds={videoIds} onVideoChange={handleVideoChange} />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center text-neutral-400">
+              Loading video...
+            </div>
+          )}
+        </div>
+
+        {layoutToggleButton}
+
+        {/* Chat toggle button */}
+        <button
+          onClick={() => setChatVisible((v) => !v)}
+          className="absolute bottom-4 left-4 z-30 w-11 h-11 flex items-center justify-center rounded-full bg-black/50 backdrop-blur-md border border-white/15 text-white/80 hover:text-white hover:bg-black/70 transition-all cursor-pointer"
+          aria-label={chatVisible ? "Hide chat" : "Show chat"}
+        >
+          {chatVisible ? (
+            // X icon to close
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          ) : (
+            // Chat bubble icon
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+            </svg>
+          )}
+        </button>
+
+        {/* Chat overlay panel */}
+        <div
+          className={`absolute z-20 transition-all duration-300 ease-in-out
+            ${chatVisible
+              ? "opacity-100 translate-y-0 pointer-events-auto"
+              : "opacity-0 translate-y-4 pointer-events-none"
+            }
+            /* Mobile: bottom sheet */
+            bottom-0 left-0 right-0 h-[55%]
+            /* Desktop: right panel */
+            md:top-3 md:right-3 md:bottom-3 md:left-auto md:h-auto md:w-[380px] md:translate-y-0
+            ${chatVisible ? "" : "md:opacity-0 md:translate-x-4"}
+          `}
+        >
+          <div className="h-full bg-black/70 backdrop-blur-xl md:rounded-2xl md:border md:border-white/10 overflow-hidden flex flex-col">
+            {/* Drag indicator (mobile only) */}
+            <div className="flex justify-center py-2 md:hidden">
+              <div className="w-10 h-1 rounded-full bg-white/30" />
+            </div>
+            <Chat
+              messages={messages}
+              input={input}
+              onInputChange={setInput}
+              onSubmit={sendMessage}
+              loading={loading}
+              suggestedReplies={suggestedReplies}
+              onQuickReply={handleQuickReply}
+              model={model}
+              onModelChange={setModel}
+              watchingVideo={watchingVideo}
+            />
+          </div>
+        </div>
+      </main>
+    );
+  }
+
+  // ─── SPLIT MODE ───
   return (
     <main
       ref={containerRef}
-      className="h-screen w-screen bg-black flex flex-col md:flex-row select-none overflow-hidden"
+      className="h-screen w-screen bg-black flex flex-col md:flex-row select-none overflow-hidden relative"
       style={{ "--split": `${splitPercent}%` } as React.CSSProperties}
     >
+      {layoutToggleButton}
+
       {/* Video — top on mobile, right on desktop */}
       <div className="overflow-hidden order-1 md:order-2 min-h-0 min-w-0 split-video">
         {videoIds.length > 0 ? (
