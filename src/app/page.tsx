@@ -21,22 +21,7 @@ export default function Home() {
   const [suggestedReplies, setSuggestedReplies] = useState<string[]>([]);
   const [watchingVideo, setWatchingVideo] = useState(false);
   const [model, setModel] = useState<"gemini-flash-latest" | "gemini-pro-latest">("gemini-flash-latest");
-  const [layoutMode, setLayoutMode] = useState<LayoutMode>("overlay");
   const [chatVisible, setChatVisible] = useState(true);
-
-  // Load layout preference from localStorage
-  useEffect(() => {
-    const saved = localStorage.getItem("layoutMode") as LayoutMode | null;
-    if (saved === "split" || saved === "overlay") setLayoutMode(saved);
-  }, []);
-
-  const toggleLayout = useCallback(() => {
-    setLayoutMode((prev) => {
-      const next = prev === "split" ? "overlay" : "split";
-      localStorage.setItem("layoutMode", next);
-      return next;
-    });
-  }, []);
 
   const sendMessage = useCallback(async (overrideInput?: string) => {
     const raw = overrideInput ?? input;
