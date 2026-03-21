@@ -370,7 +370,9 @@ export default function Home() {
       style={{ "--split": `${splitPercent}%` } as React.CSSProperties}
     >
       {/* Mobile controls — only visible on mobile */}
-      <div className="absolute top-[calc(0.75rem+env(safe-area-inset-top))] left-3 z-30 flex gap-2 md:hidden">
+      <div className={`absolute top-[calc(0.75rem+env(safe-area-inset-top))] left-3 z-30 flex gap-2 md:hidden transition-opacity duration-300 ${
+        mobileOverlay && !showControls ? "opacity-0 pointer-events-none" : ""
+      }`}>
         {/* Layout toggle */}
         <button
           onClick={toggleMobileLayout}
@@ -446,7 +448,9 @@ export default function Home() {
 
       {/* Mobile overlay chat — full height, transparent, video behind */}
       {mobileOverlay && (
-        <div className="absolute inset-0 z-20 md:hidden pointer-events-none">
+        <div className={`absolute inset-0 z-20 md:hidden transition-opacity duration-300 ${
+          showControls ? "pointer-events-none" : "pointer-events-none opacity-0"
+        }`}>
           <Chat
             messages={messages}
             input={input}
@@ -464,6 +468,13 @@ export default function Home() {
             onTapBackground={() => setShowControls((v) => !v)}
           />
         </div>
+        {/* Tap zone to bring overlay back when hidden */}
+        {!showControls && mobileOverlay && (
+          <div
+            className="absolute inset-0 z-20 md:hidden"
+            onClick={() => setShowControls(true)}
+          />
+        )}
       )}
 
       {/* Mobile split chat */}
