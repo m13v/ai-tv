@@ -17,6 +17,7 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [hasStarted, setHasStarted] = useState(false);
   const [suggestedReplies, setSuggestedReplies] = useState<string[]>([]);
+  const [model, setModel] = useState<"gemini-2.0-flash" | "gemini-pro-latest">("gemini-2.0-flash");
 
   const sendMessage = useCallback(async () => {
     if (!input.trim() || loading) return;
@@ -44,7 +45,7 @@ export default function Home() {
       const chatRes = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: updatedMessages }),
+        body: JSON.stringify({ messages: updatedMessages, model }),
       });
       const { message, searchQuery } = await chatRes.json();
 
@@ -152,7 +153,7 @@ export default function Home() {
     } finally {
       setLoading(false);
     }
-  }, [input, messages, loading, hasStarted]);
+  }, [input, messages, loading, hasStarted, model]);
 
   const handleQuickReply = useCallback(
     (reply: string) => {
@@ -258,6 +259,8 @@ export default function Home() {
           loading={loading}
           suggestedReplies={suggestedReplies}
           onQuickReply={handleQuickReply}
+          model={model}
+          onModelChange={setModel}
         />
       </div>
 
