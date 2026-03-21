@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
+import posthog from "posthog-js";
 import Player from "@/components/Player";
 import Chat from "@/components/Chat";
 
@@ -19,12 +20,22 @@ export default function Home() {
   const sendMessage = useCallback(async () => {
     if (!input.trim() || loading) return;
 
-    const userMessage: Message = { role: "user", content: input.trim() };
+    const userQuery = input.trim();
+    const userMessage: Message = { role: "user", content: userQuery };
     const updatedMessages = [...messages, userMessage];
     setMessages(updatedMessages);
     setInput("");
     setLoading(true);
+
+    const isFirstQuery = !hasStarted;
     setHasStarted(true);
+
+    // Track user query
+    posthog.capture("user_query", {
+      query: userQuery,
+      is_first_query: isFirstQuery,
+      message_count: updatedMessages.length,
+    });
 
     try {
       // Step 1: Chat with Gemini — get response + search query
@@ -34,6 +45,15 @@ export default function Home() {
         body: JSON.stringify({ messages: updatedMessages }),
       });
       const { message, searchQuery } = await chatRes.json();
+
+      // Track AI search query
+      if (searchQuery) {
+        posthog.capture("ai_search_query", {
+          user_query: userQuery,
+          search_query: searchQuery,
+          ai_response: message,
+        });
+      }
 
       if (message) {
         setMessages((prev) => [
@@ -53,6 +73,10 @@ export default function Home() {
 
         if (ids?.length > 0) {
           setVideoIds(ids);
+          posthog.capture("videos_loaded", {
+            search_query: searchQuery,
+            video_count: ids.length,
+          });
         }
       }
     } catch {
@@ -60,10 +84,11 @@ export default function Home() {
         ...prev,
         { role: "assistant", content: "Something went wrong. Try again?" },
       ]);
+      posthog.capture("query_error", { query: userQuery });
     } finally {
       setLoading(false);
     }
-  }, [input, messages, loading]);
+  }, [input, messages, loading, hasStarted]);
 
   // Landing page
   if (!hasStarted) {
@@ -83,14 +108,14 @@ export default function Home() {
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 placeholder="What do you want to watch?"
-                className="w-full bg-neutral-900/80 backdrop-blur border border-neutral-700 rounded-full px-6 py-4 pr-20 text-white placeholder-neutral-500 focus:outline-none focus:border-neutral-500 text-lg"
+                className="w-full bg-neutral-900/80 backdrop-blur border border-neutral-700 rounded-full px-6 py-4 pr-20 text-white placeholder-neutral-400 focus:outline-none focus:border-neutral-500 text-lg"
                 autoFocus
               />
               <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-0.5 pointer-events-none">
-                <kbd className="text-xs text-white/30 bg-white/10 border border-white/15 rounded px-1.5 py-0.5 font-mono">
+                <kbd className="text-xs text-white/50 bg-white/10 border border-white/15 rounded px-1.5 py-0.5 font-mono">
                   &#8984;
                 </kbd>
-                <kbd className="text-xs text-white/30 bg-white/10 border border-white/15 rounded px-1.5 py-0.5 font-mono">
+                <kbd className="text-xs text-white/50 bg-white/10 border border-white/15 rounded px-1.5 py-0.5 font-mono">
                   K
                 </kbd>
               </div>
@@ -127,7 +152,7 @@ export default function Home() {
         {videoIds.length > 0 ? (
           <Player videoIds={videoIds} />
         ) : (
-          <div className="w-full h-full flex items-center justify-center text-neutral-600">
+          <div className="w-full h-full flex items-center justify-center text-neutral-400">
             Loading video...
           </div>
         )}

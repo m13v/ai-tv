@@ -267,7 +267,7 @@ export default function Player({ videoIds }: PlayerProps) {
       {!muted && (
         <button
           onClick={toggleMute}
-          className="absolute top-3 left-3 z-20 w-9 h-9 flex items-center justify-center rounded-full bg-black/50 backdrop-blur-sm text-white/70 hover:text-white hover:bg-black/70 transition-all"
+          className="absolute top-3 left-3 z-20 w-9 h-9 flex items-center justify-center rounded-full bg-black/50 backdrop-blur-sm text-white/90 hover:text-white hover:bg-black/70 transition-all"
           aria-label="Mute"
         >
           <svg
@@ -289,7 +289,7 @@ export default function Player({ videoIds }: PlayerProps) {
 
       {/* Counter — top right */}
       {videoIds.length > 1 && (
-        <div className="absolute top-3 right-3 text-white/40 text-xs bg-black/50 backdrop-blur-sm px-2.5 py-1 rounded-full z-10">
+        <div className="absolute top-3 right-3 text-white/70 text-xs bg-black/50 backdrop-blur-sm px-2.5 py-1 rounded-full z-10">
           {currentIndex + 1}/{videoIds.length}
         </div>
       )}
@@ -300,7 +300,7 @@ export default function Player({ videoIds }: PlayerProps) {
           <button
             onClick={prev}
             disabled={currentIndex === 0}
-            className="w-10 h-10 flex items-center justify-center rounded-full bg-black/50 backdrop-blur-sm border border-white/15 text-white/60 hover:text-white hover:bg-black/70 disabled:opacity-20 disabled:cursor-default transition-all"
+            className="w-10 h-10 flex items-center justify-center rounded-full bg-black/50 backdrop-blur-sm border border-white/15 text-white/85 hover:text-white hover:bg-black/70 disabled:opacity-20 disabled:cursor-default transition-all"
             aria-label="Previous video"
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -310,7 +310,7 @@ export default function Player({ videoIds }: PlayerProps) {
           <button
             onClick={next}
             disabled={currentIndex === videoIds.length - 1}
-            className="w-10 h-10 flex items-center justify-center rounded-full bg-black/50 backdrop-blur-sm border border-white/15 text-white/60 hover:text-white hover:bg-black/70 disabled:opacity-20 disabled:cursor-default transition-all"
+            className="w-10 h-10 flex items-center justify-center rounded-full bg-black/50 backdrop-blur-sm border border-white/15 text-white/85 hover:text-white hover:bg-black/70 disabled:opacity-20 disabled:cursor-default transition-all"
             aria-label="Next video"
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -322,10 +322,15 @@ export default function Player({ videoIds }: PlayerProps) {
 
       {/* Keyboard hint — bottom center, always visible */}
       {videoIds.length > 1 && (
-        <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-10 flex items-center gap-1.5 text-white/30 text-[10px] bg-black/40 backdrop-blur-sm px-3 py-1.5 rounded-full">
-          <kbd className="bg-white/10 border border-white/15 rounded px-1 py-0.5 font-mono text-[10px]">&#8593;</kbd>
-          <kbd className="bg-white/10 border border-white/15 rounded px-1 py-0.5 font-mono text-[10px]">&#8595;</kbd>
-          <span className="ml-0.5">prev / next</span>
+        <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-10 flex items-center gap-2 text-white/60 text-[11px] bg-black/50 backdrop-blur-sm px-3.5 py-2 rounded-full">
+          <div className="flex flex-col gap-0.5">
+            <kbd className="bg-white/15 border border-white/20 rounded-[4px] px-1.5 py-0.5 font-mono text-[11px] text-white/80 text-center leading-none shadow-[0_2px_0_0_rgba(255,255,255,0.1),inset_0_1px_0_0_rgba(255,255,255,0.1)]">&#8593;</kbd>
+            <kbd className="bg-white/15 border border-white/20 rounded-[4px] px-1.5 py-0.5 font-mono text-[11px] text-white/80 text-center leading-none shadow-[0_2px_0_0_rgba(255,255,255,0.1),inset_0_1px_0_0_rgba(255,255,255,0.1)]">&#8595;</kbd>
+          </div>
+          <div className="flex flex-col">
+            <span>prev / next</span>
+            <span className="text-white/40 text-[9px]">use keyboard</span>
+          </div>
         </div>
       )}
     </div>

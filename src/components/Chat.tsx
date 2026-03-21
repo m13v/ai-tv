@@ -30,6 +30,13 @@ export default function Chat({
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
+  // Refocus input after response completes
+  useEffect(() => {
+    if (!loading) {
+      inputRef.current?.focus();
+    }
+  }, [loading]);
+
   // Expose input ref for Cmd+K
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -72,7 +79,7 @@ export default function Chat({
         ))}
         {loading && (
           <div className="flex justify-start">
-            <div className="bg-neutral-800 text-white/50 rounded-2xl rounded-bl-md px-4 py-2.5 text-sm">
+            <div className="bg-neutral-800 text-white/80 rounded-2xl rounded-bl-md px-4 py-2.5 text-sm">
               <span className="inline-flex gap-1">
                 <span className="animate-bounce" style={{ animationDelay: "0ms" }}>.</span>
                 <span className="animate-bounce" style={{ animationDelay: "150ms" }}>.</span>
@@ -95,15 +102,15 @@ export default function Chat({
               onChange={(e) => onInputChange(e.target.value)}
               onKeyDown={handleKeyDown}
               placeholder="Ask something or describe what to watch next..."
-              className="w-full bg-neutral-900 border border-neutral-700 rounded-full px-4 py-2.5 pr-16 text-white placeholder-neutral-500 focus:outline-none focus:border-neutral-600 text-sm"
+              className="w-full bg-neutral-900 border border-neutral-700 rounded-full px-4 py-2.5 pr-16 text-white placeholder-neutral-400 focus:outline-none focus:border-neutral-600 text-sm"
               disabled={loading}
               autoFocus
             />
             <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-0.5 pointer-events-none">
-              <kbd className="text-[10px] text-white/25 bg-white/8 border border-white/10 rounded px-1 py-0.5 font-mono">
+              <kbd className="text-[10px] text-white/50 bg-white/8 border border-white/10 rounded px-1 py-0.5 font-mono">
                 &#8984;
               </kbd>
-              <kbd className="text-[10px] text-white/25 bg-white/8 border border-white/10 rounded px-1 py-0.5 font-mono">
+              <kbd className="text-[10px] text-white/50 bg-white/8 border border-white/10 rounded px-1 py-0.5 font-mono">
                 K
               </kbd>
             </div>
