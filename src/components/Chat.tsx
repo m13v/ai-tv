@@ -124,7 +124,7 @@ export default function Chat({
       )}
 
       {/* Model toggle + Input */}
-      <div className="border-t border-neutral-800 px-4 py-3">
+      <div className="border-t border-white/10 px-4 py-3">
         <div className="flex items-center gap-1 mb-2">
           <span className="text-[10px] text-neutral-500 mr-1">Model:</span>
           {(["gemini-flash-latest", "gemini-pro-latest"] as const).map((m) => (
