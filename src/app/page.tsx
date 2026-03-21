@@ -20,20 +20,7 @@ export default function Home() {
   const [watchingVideo, setWatchingVideo] = useState(false);
   const [model, setModel] = useState<"gemini-flash-latest" | "gemini-pro-latest">("gemini-flash-latest");
   const [mobileOverlay, setMobileOverlay] = useState(true);
-  const [showMessages, setShowMessages] = useState(true);
   const [showControls, setShowControls] = useState(true);
-  const [tapShield, setTapShield] = useState(false);
-
-  const handleOverlayTap = useCallback(() => {
-    setShowControls((prev) => {
-      if (prev) {
-        // Hiding overlay — put up a shield so the tap doesn't hit YouTube
-        setTapShield(true);
-        setTimeout(() => setTapShield(false), 400);
-      }
-      return !prev;
-    });
-  }, []);
 
   // Load mobile layout preference
   useEffect(() => {
@@ -381,50 +368,53 @@ export default function Home() {
       }`}
       style={{ "--split": `${splitPercent}%` } as React.CSSProperties}
     >
-      {/* Mobile controls — only visible on mobile */}
-      <div className={`absolute top-[calc(0.75rem+env(safe-area-inset-top))] left-3 z-30 flex gap-2 md:hidden transition-opacity duration-300 ${
-        mobileOverlay && !showControls ? "opacity-0 pointer-events-none" : ""
-      }`}>
-        {/* Layout toggle */}
+      {/* Mobile: eye button — always visible in overlay mode, toggles entire overlay */}
+      {mobileOverlay && (
         <button
-          onClick={toggleMobileLayout}
-          className="w-9 h-9 flex items-center justify-center rounded-full bg-black/40 backdrop-blur-sm text-white/60 hover:text-white hover:bg-black/60 transition-all cursor-pointer"
-          aria-label={mobileOverlay ? "Switch to split view" : "Switch to overlay view"}
+          onClick={() => setShowControls((v) => !v)}
+          className="absolute top-[calc(0.75rem+env(safe-area-inset-top))] left-3 z-30 w-9 h-9 flex items-center justify-center rounded-full bg-black/40 backdrop-blur-sm text-white/60 hover:text-white hover:bg-black/60 transition-all cursor-pointer md:hidden"
+          aria-label={showControls ? "Hide overlay" : "Show overlay"}
         >
-          {mobileOverlay ? (
+          {showControls ? (
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <rect x="3" y="3" width="18" height="18" rx="2" />
-              <line x1="3" y1="12" x2="21" y2="12" />
+              <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94" />
+              <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19" />
+              <line x1="1" y1="1" x2="23" y2="23" />
             </svg>
           ) : (
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <rect x="3" y="3" width="18" height="18" rx="2" />
-              <rect x="8" y="8" width="13" height="13" rx="1" />
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+              <circle cx="12" cy="12" r="3" />
             </svg>
           )}
         </button>
-        {/* Hide/show messages toggle — only in overlay mode */}
-        {mobileOverlay && (
-          <button
-            onClick={() => setShowMessages((v) => !v)}
-            className="w-9 h-9 flex items-center justify-center rounded-full bg-black/40 backdrop-blur-sm text-white/60 hover:text-white hover:bg-black/60 transition-all cursor-pointer"
-            aria-label={showMessages ? "Hide messages" : "Show messages"}
-          >
-            {showMessages ? (
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94" />
-                <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19" />
-                <line x1="1" y1="1" x2="23" y2="23" />
-              </svg>
-            ) : (
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-                <circle cx="12" cy="12" r="3" />
-              </svg>
-            )}
-          </button>
-        )}
-      </div>
+      )}
+      {/* Mobile: layout toggle — only visible when overlay is showing */}
+      {mobileOverlay && showControls && (
+        <button
+          onClick={toggleMobileLayout}
+          className="absolute top-[calc(0.75rem+env(safe-area-inset-top))] left-14 z-30 w-9 h-9 flex items-center justify-center rounded-full bg-black/40 backdrop-blur-sm text-white/60 hover:text-white hover:bg-black/60 transition-all cursor-pointer md:hidden"
+          aria-label={mobileOverlay ? "Switch to split view" : "Switch to overlay view"}
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <rect x="3" y="3" width="18" height="18" rx="2" />
+            <line x1="3" y1="12" x2="21" y2="12" />
+          </svg>
+        </button>
+      )}
+      {/* Mobile: layout toggle in split mode */}
+      {!mobileOverlay && (
+        <button
+          onClick={toggleMobileLayout}
+          className="absolute top-[calc(0.75rem+env(safe-area-inset-top))] left-3 z-30 w-9 h-9 flex items-center justify-center rounded-full bg-black/40 backdrop-blur-sm text-white/60 hover:text-white hover:bg-black/60 transition-all cursor-pointer md:hidden"
+          aria-label="Switch to overlay view"
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <rect x="3" y="3" width="18" height="18" rx="2" />
+            <rect x="8" y="8" width="13" height="13" rx="1" />
+          </svg>
+        </button>
+      )}
 
       {/* Video */}
       <div className={`md:relative md:overflow-hidden md:order-2 md:min-h-0 md:min-w-0 split-video-desktop ${
@@ -459,10 +449,8 @@ export default function Home() {
       </div>
 
       {/* Mobile overlay chat — full height, transparent, video behind */}
-      {mobileOverlay && (
-        <div className={`absolute inset-0 z-20 md:hidden transition-opacity duration-300 ${
-          showControls ? "pointer-events-none" : "pointer-events-none opacity-0"
-        }`}>
+      {mobileOverlay && showControls && (
+        <div className="absolute inset-0 z-20 md:hidden pointer-events-none">
           <Chat
             messages={messages}
             input={input}
@@ -475,22 +463,8 @@ export default function Home() {
             onModelChange={setModel}
             watchingVideo={watchingVideo}
             overlay
-            showMessages={showMessages}
-            showControls={showControls}
-            onTapBackground={handleOverlayTap}
           />
         </div>
-      )}
-      {/* Shield to absorb tap when hiding overlay — prevents YouTube from also toggling */}
-      {tapShield && (
-        <div className="absolute inset-0 z-20 md:hidden" />
-      )}
-      {/* Tap zone to bring overlay back when hidden */}
-      {!showControls && !tapShield && mobileOverlay && (
-        <div
-          className="absolute inset-0 z-20 md:hidden"
-          onClick={() => setShowControls(true)}
-        />
       )}
 
       {/* Mobile split chat */}
