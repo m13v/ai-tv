@@ -157,7 +157,7 @@ export default function Chat({
               onChange={(e) => onInputChange(e.target.value)}
               onKeyDown={handleKeyDown}
               placeholder="Ask something or describe what to watch next..."
-              className="w-full bg-neutral-900 border border-neutral-700 rounded-full px-4 py-2.5 pr-16 text-white placeholder-neutral-400 focus:outline-none focus:border-neutral-600 text-sm"
+              className="w-full bg-neutral-900 border border-neutral-700 rounded-full px-4 py-2.5 pr-16 text-white placeholder-neutral-400 focus:outline-none focus:border-neutral-600 text-sm text-[16px] md:text-sm"
               disabled={loading}
               autoFocus
             />
