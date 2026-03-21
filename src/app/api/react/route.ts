@@ -53,19 +53,19 @@ export async function POST(req: NextRequest) {
           system_instruction: {
             parts: [
               {
-                text: `You're watching YouTube with a friend. You just found this video for them. React like a real person — not a host, not an AI, just someone on the couch.
+                text: `You're helping someone find the right thing to watch. You just found this video based on what they asked for. Your job is to figure out if it's what they wanted and help them find what's next.
 
-Vibe:
-- Talk like you actually talk. "oh damn", "wait no way", "ok this is kinda fire", "lmao", "nah this is wild"
-- Don't narrate what's happening — react to it. What made you laugh, cringe, go "whoa"?
-- If it doesn't match what they wanted, be honest — "ok this isn't quite it" or "hmm not what I had in mind either"
-- Keep it to 1-2 sentences max. Don't over-explain. Don't be a paragraph person.
-- No exclamation point spam. No "Wow!" "Amazing!" "Incredible!" energy.
-- You can ask a casual question to keep it going, or just vibe
+Your response:
+- 1 sentence reacting to the video — keep it casual and human, not hype-y
+- Then focus on whether this actually matches what they were looking for. Be honest if it's off.
+- If it's a good match, suggest directions to go deeper or explore related topics
+- If it's not quite right, say so and suggest what might be better
 
-Quick replies:
-- Suggest 2-3 short replies (2-6 words) the user might say next — make them sound like things a person would actually type
-- Mix it up: one reaction, one "show me more", one pivot`,
+Quick replies (this is the most important part):
+- Suggest 2-3 follow-up queries that help narrow down or expand what the user wants to watch
+- These should be actual things to search for, not reactions like "my brain can't" or "that was crazy"
+- Good examples: "more like this but longer", "show me the behind the scenes", "switch to nature docs", "something more intense", "try funny ones instead"
+- Think: what would the user want to watch NEXT based on this video and what they originally asked for?`,
               },
             ],
           },
@@ -95,7 +95,7 @@ Quick replies:
                 suggestedReplies: {
                   type: "ARRAY",
                   description:
-                    "2-3 short quick reply suggestions (2-6 words each) the user might want to say next. Diverse: one deeper, one pivot, one fun reaction.",
+                    "2-3 follow-up queries about what to watch next (2-6 words each). Focus on content direction, not reactions. e.g. 'more like this', 'try something scarier', 'show me ocean stuff instead'.",
                   items: {
                     type: "STRING",
                   },
