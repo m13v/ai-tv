@@ -445,7 +445,7 @@ export default function Home() {
 
       {/* Mobile overlay chat — full height, transparent, video behind */}
       {mobileOverlay && (
-        <div className="absolute inset-0 z-20 md:hidden">
+        <div className="absolute inset-0 z-20 md:hidden pointer-events-none">
           <Chat
             messages={messages}
             input={input}
