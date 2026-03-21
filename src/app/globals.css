@@ -31,6 +31,26 @@ html, body {
   height: 100% !important;
 }
 
+/* Split layout panels — uses --split CSS variable */
+.split-video {
+  height: var(--split);
+  width: 100%;
+}
+.split-chat {
+  height: calc(100% - var(--split) - 12px);
+  width: 100%;
+}
+@media (min-width: 768px) {
+  .split-video {
+    width: calc(100% - var(--split) - 12px);
+    height: 100%;
+  }
+  .split-chat {
+    width: var(--split);
+    height: 100%;
+  }
+}
+
 @keyframes fade-out {
   0%, 70% { opacity: 1; }
   100% { opacity: 0; }
