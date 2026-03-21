@@ -117,12 +117,12 @@ export default function Chat({
 
       {/* Suggested replies */}
       {suggestedReplies && suggestedReplies.length > 0 && !loading && (
-        <div className="px-4 pb-2 flex flex-wrap gap-2">
+        <div className="px-4 pb-2 flex gap-2 overflow-x-auto md:flex-wrap md:overflow-x-visible scrollbar-none">
           {suggestedReplies.map((reply, i) => (
             <button
               key={i}
               onClick={() => onQuickReply?.(reply)}
-              className="bg-neutral-800 hover:bg-neutral-700 text-white text-sm px-3 py-1.5 rounded-full border border-neutral-700 hover:border-neutral-500 transition-colors"
+              className="bg-neutral-800 hover:bg-neutral-700 text-white text-sm px-3 py-1.5 rounded-full border border-neutral-700 hover:border-neutral-500 transition-colors whitespace-nowrap shrink-0"
             >
               {reply}
             </button>
