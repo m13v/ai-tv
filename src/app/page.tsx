@@ -19,6 +19,13 @@ export default function Home() {
   const [suggestedReplies, setSuggestedReplies] = useState<string[]>([]);
   const [watchingVideo, setWatchingVideo] = useState(false);
   const [model, setModel] = useState<"gemini-flash-latest" | "gemini-pro-latest">("gemini-flash-latest");
+  const [mobileOverlay, setMobileOverlay] = useState(true);
+
+  // Load mobile layout preference
+  useEffect(() => {
+    const saved = localStorage.getItem("mobileOverlay");
+    if (saved !== null) setMobileOverlay(saved === "true");
+  }, []);
 
   const sendMessage = useCallback(async (overrideInput?: string) => {
     const raw = overrideInput ?? input;
@@ -343,16 +350,49 @@ export default function Home() {
     );
   }
 
-  // Mobile: overlay (video fullscreen + chat on top)
-  // Desktop: split (side by side with draggable divider)
+  // Desktop: always split (side by side with draggable divider)
+  // Mobile: toggle between split and overlay
+  const toggleMobileLayout = useCallback(() => {
+    setMobileOverlay((prev) => {
+      const next = !prev;
+      localStorage.setItem("mobileOverlay", String(next));
+      return next;
+    });
+  }, []);
+
   return (
     <main
       ref={containerRef}
-      className="h-screen w-screen bg-black select-none overflow-hidden relative md:flex md:flex-row"
+      className={`h-screen w-screen bg-black select-none overflow-hidden relative md:flex md:flex-row ${
+        !mobileOverlay ? "flex flex-col" : ""
+      }`}
       style={{ "--split": `${splitPercent}%` } as React.CSSProperties}
     >
-      {/* Video — fullscreen on mobile, split panel on desktop */}
-      <div className="absolute inset-0 md:relative md:overflow-hidden md:order-2 md:min-h-0 md:min-w-0 split-video-desktop">
+      {/* Mobile layout toggle — only visible on mobile */}
+      <button
+        onClick={toggleMobileLayout}
+        className="absolute top-3 left-3 z-30 w-9 h-9 flex items-center justify-center rounded-full bg-black/40 backdrop-blur-sm text-white/60 hover:text-white hover:bg-black/60 transition-all cursor-pointer md:hidden"
+        aria-label={mobileOverlay ? "Switch to split view" : "Switch to overlay view"}
+      >
+        {mobileOverlay ? (
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <rect x="3" y="3" width="18" height="18" rx="2" />
+            <line x1="3" y1="12" x2="21" y2="12" />
+          </svg>
+        ) : (
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <rect x="3" y="3" width="18" height="18" rx="2" />
+            <rect x="8" y="8" width="13" height="13" rx="1" />
+          </svg>
+        )}
+      </button>
+
+      {/* Video */}
+      <div className={`md:relative md:overflow-hidden md:order-2 md:min-h-0 md:min-w-0 split-video-desktop ${
+        mobileOverlay
+          ? "absolute inset-0"
+          : "overflow-hidden order-1 min-h-0 min-w-0 split-video-mobile"
+      }`}>
         {videoIds.length > 0 ? (
           <Player videoIds={videoIds} onVideoChange={handleVideoChange} />
         ) : (
@@ -362,39 +402,60 @@ export default function Home() {
         )}
       </div>
 
-      {/* Drag handle — desktop only */}
+      {/* Drag handle — desktop always, mobile only in split mode */}
       <div
-        className={`hidden md:flex group items-center justify-center md:order-2 touch-none transition-all duration-100
-          md:h-full md:cursor-col-resize md:w-6 shrink-0
+        className={`group items-center justify-center touch-none transition-all duration-100
+          md:flex md:order-2 md:h-full md:cursor-col-resize md:w-6 shrink-0
+          ${mobileOverlay ? "hidden" : "flex order-2 w-full cursor-row-resize h-6"}
           ${isDragging ? "bg-blue-500/30" : "hover:bg-white/20"}`}
         onMouseDown={startDrag}
         onTouchStart={startDrag}
       >
         <div className={`rounded-full transition-all duration-100
           ${isDragging
-            ? "bg-blue-400 md:w-1.5 md:h-16"
-            : "bg-neutral-500 md:w-1 md:h-10 group-hover:bg-white md:group-hover:w-1.5 md:group-hover:h-14"
+            ? "bg-blue-400 h-1.5 w-16 md:w-1.5 md:h-16"
+            : "bg-neutral-500 h-1 w-10 md:w-1 md:h-10 group-hover:bg-white group-hover:h-1.5 group-hover:w-14 md:group-hover:w-1.5 md:group-hover:h-14"
           }`}
         />
       </div>
 
-      {/* Mobile: chat overlay — full height, fully transparent, video shows through */}
-      <div className="absolute inset-0 z-20 md:hidden">
-        <Chat
-          messages={messages}
-          input={input}
-          onInputChange={setInput}
-          onSubmit={sendMessage}
-          loading={loading}
-          suggestedReplies={suggestedReplies}
-          onQuickReply={handleQuickReply}
-          model={model}
-          onModelChange={setModel}
-          watchingVideo={watchingVideo}
-        />
-      </div>
+      {/* Mobile overlay chat — full height, transparent, video behind */}
+      {mobileOverlay && (
+        <div className="absolute inset-0 z-20 md:hidden">
+          <Chat
+            messages={messages}
+            input={input}
+            onInputChange={setInput}
+            onSubmit={sendMessage}
+            loading={loading}
+            suggestedReplies={suggestedReplies}
+            onQuickReply={handleQuickReply}
+            model={model}
+            onModelChange={setModel}
+            watchingVideo={watchingVideo}
+          />
+        </div>
+      )}
 
-      {/* Desktop: chat split panel */}
+      {/* Mobile split chat */}
+      {!mobileOverlay && (
+        <div className="overflow-hidden flex flex-col order-3 min-h-0 min-w-0 split-chat-mobile md:hidden">
+          <Chat
+            messages={messages}
+            input={input}
+            onInputChange={setInput}
+            onSubmit={sendMessage}
+            loading={loading}
+            suggestedReplies={suggestedReplies}
+            onQuickReply={handleQuickReply}
+            model={model}
+            onModelChange={setModel}
+            watchingVideo={watchingVideo}
+          />
+        </div>
+      )}
+
+      {/* Desktop: chat split panel (always) */}
       <div className="hidden md:flex overflow-hidden flex-col md:order-1 min-h-0 min-w-0 split-chat">
         <Chat
           messages={messages}
