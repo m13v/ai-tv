@@ -365,17 +365,20 @@ export default function Home() {
 
       {/* Drag handle */}
       <div
-        className={`group flex items-center justify-center order-2 md:order-2 touch-none transition-all duration-150
-          w-full h-3 cursor-row-resize
-          md:w-3 md:h-full md:cursor-col-resize shrink-0
-          ${isDragging ? "bg-white/15" : "hover:bg-white/10"}`}
+        className={`group flex items-center justify-center order-2 md:order-2 touch-none transition-all duration-100
+          w-full cursor-row-resize
+          md:h-full md:cursor-col-resize shrink-0
+          ${isDragging
+            ? "h-4 md:w-4 bg-blue-500/30"
+            : "h-3 md:w-3 hover:h-4 md:hover:w-4 hover:bg-white/20"
+          }`}
         onMouseDown={startDrag}
         onTouchStart={startDrag}
       >
-        <div className={`rounded-full transition-all duration-150
+        <div className={`rounded-full transition-all duration-100
           ${isDragging
-            ? "bg-white h-2 w-32 md:w-2 md:h-32 shadow-[0_0_20px_rgba(255,255,255,0.6),0_0_6px_rgba(255,255,255,0.8)]"
-            : "bg-neutral-600 h-1 w-10 md:w-1 md:h-10 group-hover:bg-white group-hover:h-1.5 group-hover:w-20 md:group-hover:w-1.5 md:group-hover:h-20 group-hover:shadow-[0_0_12px_rgba(255,255,255,0.4)]"
+            ? "bg-blue-400 h-1.5 w-full md:w-1.5 md:h-full"
+            : "bg-neutral-700 h-px w-full md:w-px md:h-full group-hover:bg-neutral-400 group-hover:h-0.5 md:group-hover:h-full md:group-hover:w-0.5"
           }`}
         />
       </div>
