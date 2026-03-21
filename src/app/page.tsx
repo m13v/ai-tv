@@ -162,45 +162,85 @@ export default function Home() {
     []
   );
 
+  const quickQueries = [
+    "Investigate how AI TV works",
+    "Come up with the best queries",
+    "Show me something mind-blowing",
+    "What's trending right now?",
+    "Surprise me with something weird",
+  ];
+
+  const handleQuickQuery = (query: string) => {
+    setInput(query);
+    // Trigger send on next tick after state update
+    setTimeout(() => {
+      const form = document.querySelector("form");
+      form?.requestSubmit();
+    }, 0);
+  };
+
   // Landing page
   if (!hasStarted) {
     return (
       <main className="h-screen w-screen flex flex-col items-center justify-center bg-black px-4">
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            sendMessage();
-          }}
-          className="w-full max-w-lg"
-        >
-          <div className="flex gap-2">
-            <div className="relative flex-1">
-              <input
-                type="text"
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                placeholder="What do you want to watch?"
-                className="w-full bg-neutral-900/80 backdrop-blur border border-neutral-700 rounded-full px-6 py-4 pr-20 text-white placeholder-neutral-400 focus:outline-none focus:border-neutral-500 text-lg"
-                autoFocus
-              />
-              <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-0.5 pointer-events-none">
-                <kbd className="text-xs text-white/50 bg-white/10 border border-white/15 rounded px-1.5 py-0.5 font-mono">
-                  &#8984;
-                </kbd>
-                <kbd className="text-xs text-white/50 bg-white/10 border border-white/15 rounded px-1.5 py-0.5 font-mono">
-                  K
-                </kbd>
-              </div>
-            </div>
-            <button
-              type="submit"
-              disabled={!input.trim()}
-              className="bg-white text-black font-semibold px-6 py-4 rounded-full hover:bg-neutral-200 disabled:opacity-40 disabled:cursor-not-allowed transition-colors text-lg"
-            >
-              Watch
-            </button>
+        <div className="w-full max-w-lg flex flex-col items-center gap-6">
+          <div className="text-center mb-2">
+            <h1 className="text-5xl font-bold text-white tracking-tight">
+              AI TV
+            </h1>
+            <p className="text-neutral-400 text-lg mt-2">
+              Search anything, watch YouTube Shorts
+            </p>
           </div>
-        </form>
+
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              sendMessage();
+            }}
+            className="w-full"
+          >
+            <div className="flex gap-2">
+              <div className="relative flex-1">
+                <input
+                  type="text"
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  placeholder="What do you want to watch?"
+                  className="w-full bg-neutral-900/80 backdrop-blur border border-neutral-700 rounded-full px-6 py-4 pr-20 text-white placeholder-neutral-400 focus:outline-none focus:border-neutral-500 text-lg"
+                  autoFocus
+                />
+                <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-0.5 pointer-events-none">
+                  <kbd className="text-xs text-white/50 bg-white/10 border border-white/15 rounded px-1.5 py-0.5 font-mono">
+                    &#8984;
+                  </kbd>
+                  <kbd className="text-xs text-white/50 bg-white/10 border border-white/15 rounded px-1.5 py-0.5 font-mono">
+                    K
+                  </kbd>
+                </div>
+              </div>
+              <button
+                type="submit"
+                disabled={!input.trim()}
+                className="bg-white text-black font-semibold px-6 py-4 rounded-full hover:bg-neutral-200 disabled:opacity-40 disabled:cursor-not-allowed transition-colors text-lg"
+              >
+                Watch
+              </button>
+            </div>
+          </form>
+
+          <div className="flex flex-wrap justify-center gap-2">
+            {quickQueries.map((query) => (
+              <button
+                key={query}
+                onClick={() => handleQuickQuery(query)}
+                className="bg-neutral-900/80 backdrop-blur border border-neutral-700 text-neutral-300 text-sm px-4 py-2 rounded-full hover:bg-neutral-800 hover:text-white hover:border-neutral-600 transition-colors cursor-pointer"
+              >
+                {query}
+              </button>
+            ))}
+          </div>
+        </div>
       </main>
     );
   }
