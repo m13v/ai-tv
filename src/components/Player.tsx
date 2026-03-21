@@ -5,7 +5,6 @@ import { useEffect, useRef, useState } from "react";
 interface PlayerProps {
   videoIds: string[];
   query: string;
-  onNewSearch?: (query: string) => void;
 }
 
 declare global {
