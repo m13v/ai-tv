@@ -377,8 +377,8 @@ export default function Home() {
       >
         <div className={`rounded-full transition-all duration-100
           ${isDragging
-            ? "bg-blue-400 h-1.5 w-full md:w-1.5 md:h-full"
-            : "bg-neutral-700 h-px w-full md:w-px md:h-full group-hover:bg-neutral-400 group-hover:h-0.5 md:group-hover:h-full md:group-hover:w-0.5"
+            ? "bg-blue-400 h-1.5 w-16 md:w-1.5 md:h-16"
+            : "bg-neutral-500 h-1 w-10 md:w-1 md:h-10 group-hover:bg-white group-hover:h-1.5 group-hover:w-14 md:group-hover:w-1.5 md:group-hover:h-14"
           }`}
         />
       </div>
