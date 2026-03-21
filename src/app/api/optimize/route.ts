@@ -7,15 +7,14 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "query is required" }, { status: 400 });
   }
 
-  const apiKey = process.env.GOOGLE_GEMINI_API_KEY;
+  const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
-    // Fall back to original query if no key
     return NextResponse.json({ searchQuery: query });
   }
 
   try {
     const res = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${apiKey}`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -39,8 +38,7 @@ User request: ${query}`,
           ],
           generationConfig: {
             temperature: 0.3,
-            maxOutputTokens: 32,
-            thinkingConfig: { thinkingBudget: 0 },
+            maxOutputTokens: 256,
           },
         }),
       }
@@ -54,6 +52,10 @@ User request: ${query}`,
     const data = await res.json();
     const optimized =
       data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
+
+    console.log(
+      `Gemini optimize: "${query}" → "${optimized}" (model: ${data?.modelVersion}, thinking tokens: ${data?.usageMetadata?.thoughtsTokenCount ?? 0}, output tokens: ${data?.usageMetadata?.candidatesTokenCount ?? 0})`
+    );
 
     return NextResponse.json({ searchQuery: optimized || query });
   } catch (err) {
