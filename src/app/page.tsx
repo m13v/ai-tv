@@ -342,91 +342,62 @@ export default function Home() {
     );
   }
 
-  // Chat + Video side by side (desktop) / stacked (mobile)
-  // On mobile: splitPercent = video height %, chat gets the rest
-  // On desktop: splitPercent = chat width %, video gets the rest
+  // Chat + Video: side by side (desktop) / stacked (mobile)
+  // Mobile: video top (splitPercent%), chat bottom
+  // Desktop: chat left (splitPercent%), video right
+  const isBrowser = typeof window !== "undefined";
+  const isMobile = isBrowser && window.innerWidth < 768;
+
   return (
-    <main ref={containerRef} className="h-screen w-screen bg-black flex flex-col md:flex-row">
-      {/* Chat — top area on mobile (order-2 = bottom), left on desktop */}
+    <main ref={containerRef} className="h-screen w-screen bg-black flex flex-col md:flex-row select-none">
+      {/* Video — top on mobile, right on desktop */}
       <div
-        className="w-full md:h-full md:order-1 flex flex-col overflow-hidden"
-        style={{
-          height: `calc(${100 - splitPercent}% - 2px)`,
-          width: undefined,
-        }}
+        className="shrink-0 overflow-hidden order-1 md:order-2"
+        style={isMobile
+          ? { height: `calc(${splitPercent}% - 2px)`, width: '100%' }
+          : { width: `calc(${100 - splitPercent}% - 2px)`, height: '100%' }
+        }
       >
-        <div className="hidden md:flex w-full h-full flex-col" style={{ width: `${splitPercent}%`, height: '100%' }}>
-          <Chat
-            messages={messages}
-            input={input}
-            onInputChange={setInput}
-            onSubmit={sendMessage}
-            loading={loading}
-            suggestedReplies={suggestedReplies}
-            onQuickReply={handleQuickReply}
-            model={model}
-            onModelChange={setModel}
-            watchingVideo={watchingVideo}
-          />
-        </div>
-        <div className="md:hidden w-full h-full flex flex-col order-2">
-          <Chat
-            messages={messages}
-            input={input}
-            onInputChange={setInput}
-            onSubmit={sendMessage}
-            loading={loading}
-            suggestedReplies={suggestedReplies}
-            onQuickReply={handleQuickReply}
-            model={model}
-            onModelChange={setModel}
-            watchingVideo={watchingVideo}
-          />
-        </div>
+        {videoIds.length > 0 ? (
+          <Player videoIds={videoIds} onVideoChange={handleVideoChange} />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center text-neutral-400">
+            Loading video...
+          </div>
+        )}
       </div>
 
       {/* Drag handle */}
       <div
-        className="md:hidden flex items-center justify-center bg-neutral-900 border-y border-neutral-700 h-1 cursor-row-resize touch-none order-1 shrink-0"
+        className="shrink-0 flex items-center justify-center bg-neutral-900 order-2 md:order-2 touch-none
+          h-1 cursor-row-resize border-y border-neutral-700
+          md:h-full md:w-1 md:cursor-col-resize md:border-x md:border-y-0"
         onMouseDown={startDrag}
         onTouchStart={startDrag}
       >
-        <div className="w-10 h-0.5 rounded-full bg-neutral-500" />
-      </div>
-      <div
-        className="hidden md:flex items-center justify-center bg-neutral-900 border-x border-neutral-700 w-1 cursor-col-resize touch-none order-1 shrink-0"
-        onMouseDown={startDrag}
-        onTouchStart={startDrag}
-      >
-        <div className="h-10 w-0.5 rounded-full bg-neutral-500" />
+        <div className="w-10 h-0.5 md:w-0.5 md:h-10 rounded-full bg-neutral-500" />
       </div>
 
-      {/* Video — top on mobile, right on desktop */}
+      {/* Chat — bottom on mobile, left on desktop */}
       <div
-        className="w-full md:h-full md:order-2 overflow-hidden"
-        style={{
-          height: `calc(${splitPercent}% - 2px)`,
-          width: undefined,
-        }}
+        className="shrink-0 overflow-hidden flex flex-col order-3 md:order-1"
+        style={isMobile
+          ? { height: `calc(${100 - splitPercent}% - 2px)`, width: '100%' }
+          : { width: `calc(${splitPercent}% - 2px)`, height: '100%' }
+        }
       >
-        <div className="hidden md:block w-full h-full" style={{ width: '100%', height: '100%' }}>
-          {videoIds.length > 0 ? (
-            <Player videoIds={videoIds} onVideoChange={handleVideoChange} />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center text-neutral-400">
-              Loading video...
-            </div>
-          )}
-        </div>
-        <div className="md:hidden w-full h-full">
-          {videoIds.length > 0 ? (
-            <Player videoIds={videoIds} onVideoChange={handleVideoChange} />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center text-neutral-400">
-              Loading video...
-            </div>
-          )}
-        </div>
+        <Chat
+          messages={messages}
+          input={input}
+          onInputChange={setInput}
+          onSubmit={sendMessage}
+          loading={loading}
+          suggestedReplies={suggestedReplies}
+          onQuickReply={handleQuickReply}
+          model={model}
+          onModelChange={setModel}
+          watchingVideo={watchingVideo}
+        />
       </div>
     </main>
   );
