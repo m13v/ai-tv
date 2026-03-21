@@ -5,6 +5,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 interface PlayerProps {
   videoIds: string[];
   onVideoChange?: (videoId: string, index: number) => void;
+  hideControls?: boolean;
 }
 
 declare global {
@@ -46,7 +47,7 @@ interface YTPlayer {
   destroy: () => void;
 }
 
-export default function Player({ videoIds, onVideoChange }: PlayerProps) {
+export default function Player({ videoIds, onVideoChange, hideControls }: PlayerProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [muted, setMuted] = useState(true);
   const mutedRef = useRef(true);
@@ -255,35 +256,37 @@ export default function Player({ videoIds, onVideoChange }: PlayerProps) {
 
 
       {/* Mute/Unmute toggle — above chat controls on mobile, bottom-right on desktop */}
-      <button
-        onClick={toggleMute}
-        className="absolute bottom-[22%] right-3 md:bottom-3 z-30 w-9 h-9 flex items-center justify-center rounded-full bg-black/30 backdrop-blur-sm text-white/60 hover:text-white/90 hover:bg-black/50 transition-all cursor-pointer"
-        aria-label={muted ? "Unmute" : "Mute"}
-      >
-        {muted ? (
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
-            <line x1="23" y1="9" x2="17" y2="15" />
-            <line x1="17" y1="9" x2="23" y2="15" />
-          </svg>
-        ) : (
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
-            <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
-            <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
-          </svg>
-        )}
-      </button>
+      {!hideControls && (
+        <button
+          onClick={toggleMute}
+          className="absolute bottom-[22%] right-3 md:bottom-3 z-30 w-9 h-9 flex items-center justify-center rounded-full bg-black/30 backdrop-blur-sm text-white/60 hover:text-white/90 hover:bg-black/50 transition-all cursor-pointer"
+          aria-label={muted ? "Unmute" : "Mute"}
+        >
+          {muted ? (
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+              <line x1="23" y1="9" x2="17" y2="15" />
+              <line x1="17" y1="9" x2="23" y2="15" />
+            </svg>
+          ) : (
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+              <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
+              <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
+            </svg>
+          )}
+        </button>
+      )}
 
       {/* Counter — top right */}
-      {videoIds.length > 1 && (
+      {!hideControls && videoIds.length > 1 && (
         <div className="absolute top-[calc(0.75rem+env(safe-area-inset-top))] right-3 text-white/70 text-xs bg-black/50 backdrop-blur-sm px-2.5 py-1 rounded-full z-30">
           {currentIndex + 1}/{videoIds.length}
         </div>
       )}
 
       {/* Up/Down navigation buttons — right side */}
-      {videoIds.length > 1 && (
+      {!hideControls && videoIds.length > 1 && (
         <div className="absolute right-3 top-1/2 -translate-y-1/2 z-30 flex flex-col gap-2">
           <button
             onClick={prev}
@@ -309,7 +312,7 @@ export default function Player({ videoIds, onVideoChange }: PlayerProps) {
       )}
 
       {/* Keyboard hint — bottom center, hidden on mobile */}
-      {videoIds.length > 1 && (
+      {!hideControls && videoIds.length > 1 && (
         <div className="hidden md:flex absolute bottom-3 left-1/2 -translate-x-1/2 z-10 items-center gap-2 text-white/60 text-[11px] bg-black/50 backdrop-blur-sm px-3.5 py-2 rounded-full">
           <div className="flex flex-col gap-0.5">
             <kbd className="bg-white/15 border border-white/20 rounded-[4px] px-1.5 py-0.5 font-mono text-[11px] text-white/80 text-center leading-none shadow-[0_2px_0_0_rgba(255,255,255,0.1),inset_0_1px_0_0_rgba(255,255,255,0.1)]">&#8593;</kbd>
