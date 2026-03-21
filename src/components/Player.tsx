@@ -329,7 +329,7 @@ export default function Player({ videoIds }: PlayerProps) {
           </div>
           <div className="flex flex-col">
             <span>prev / next</span>
-            <span className="text-white/40 text-[9px]">use keyboard</span>
+            <span className="text-[9px]">use keyboard</span>
           </div>
         </div>
       )}
