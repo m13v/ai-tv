@@ -2,6 +2,8 @@ name: Deploy to Vercel
 
 on:
   push:
+    branches:
+      - main
     tags:
       - 'v*'
 
@@ -18,11 +20,31 @@ jobs:
       - name: Install Vercel CLI
         run: npm install -g vercel
 
-      - name: Pull Vercel Environment
+      - name: Pull Vercel Environment (Production)
+        if: startsWith(github.ref, 'refs/tags/v')
         run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
 
-      - name: Build
+      - name: Pull Vercel Environment (Preview)
+        if: "!startsWith(github.ref, 'refs/tags/v')"
+        run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Build (Production)
+        if: startsWith(github.ref, 'refs/tags/v')
         run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
 
+      - name: Build (Preview)
+        if: "!startsWith(github.ref, 'refs/tags/v')"
+        run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
+
       - name: Deploy to Production
+        if: startsWith(github.ref, 'refs/tags/v')
         run: vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Deploy Preview
+        if: "!startsWith(github.ref, 'refs/tags/v')"
+        id: preview
+        run: |
+          url=$(vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }})
+          echo "url=$url" >> "$GITHUB_OUTPUT"
+          echo "### Preview Deployment" >> "$GITHUB_STEP_SUMMARY"
+          echo "URL: $url" >> "$GITHUB_STEP_SUMMARY"
