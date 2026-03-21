@@ -257,7 +257,7 @@ export default function Player({ videoIds, onVideoChange }: PlayerProps) {
       {/* Mute/Unmute toggle — above chat controls on mobile, bottom-right on desktop */}
       <button
         onClick={toggleMute}
-        className="absolute bottom-[22%] right-3 md:bottom-3 z-20 w-9 h-9 flex items-center justify-center rounded-full bg-black/30 backdrop-blur-sm text-white/60 hover:text-white/90 hover:bg-black/50 transition-all cursor-pointer"
+        className="absolute bottom-[22%] right-3 md:bottom-3 z-30 w-9 h-9 flex items-center justify-center rounded-full bg-black/30 backdrop-blur-sm text-white/60 hover:text-white/90 hover:bg-black/50 transition-all cursor-pointer"
         aria-label={muted ? "Unmute" : "Mute"}
       >
         {muted ? (
@@ -277,14 +277,14 @@ export default function Player({ videoIds, onVideoChange }: PlayerProps) {
 
       {/* Counter — top right */}
       {videoIds.length > 1 && (
-        <div className="absolute top-3 right-3 text-white/70 text-xs bg-black/50 backdrop-blur-sm px-2.5 py-1 rounded-full z-10">
+        <div className="absolute top-3 right-3 text-white/70 text-xs bg-black/50 backdrop-blur-sm px-2.5 py-1 rounded-full z-30">
           {currentIndex + 1}/{videoIds.length}
         </div>
       )}
 
       {/* Up/Down navigation buttons — right side */}
       {videoIds.length > 1 && (
-        <div className="absolute right-3 top-1/2 -translate-y-1/2 z-10 flex flex-col gap-2">
+        <div className="absolute right-3 top-1/2 -translate-y-1/2 z-30 flex flex-col gap-2">
           <button
             onClick={prev}
             disabled={currentIndex === 0}
