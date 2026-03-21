@@ -103,7 +103,12 @@ export default function Chat({
         {watchingVideo && !loading && (
           <div className="flex justify-start">
             <div className="bg-neutral-800 text-white/60 rounded-2xl rounded-bl-md px-4 py-2.5 text-sm italic">
-              Watching video...
+              Watching video
+              <span className="inline-flex gap-0.5 ml-0.5">
+                <span className="animate-bounce" style={{ animationDelay: "0ms" }}>.</span>
+                <span className="animate-bounce" style={{ animationDelay: "150ms" }}>.</span>
+                <span className="animate-bounce" style={{ animationDelay: "300ms" }}>.</span>
+              </span>
             </div>
           </div>
         )}
