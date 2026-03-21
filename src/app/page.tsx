@@ -17,7 +17,8 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [hasStarted, setHasStarted] = useState(false);
   const [suggestedReplies, setSuggestedReplies] = useState<string[]>([]);
-  const [model, setModel] = useState<"gemini-2.0-flash" | "gemini-pro-latest">("gemini-2.0-flash");
+  const [watchingVideo, setWatchingVideo] = useState(false);
+  const [model, setModel] = useState<"gemini-flash-latest" | "gemini-pro-latest">("gemini-flash-latest");
 
   const sendMessage = useCallback(async () => {
     if (!input.trim() || loading) return;
@@ -82,6 +83,8 @@ export default function Home() {
           });
 
           // Step 3: Have Gemini watch the video and react
+          setLoading(false); // Let user type while Gemini watches
+          setWatchingVideo(true);
           const currentVideoId = ids[0];
           const messagesWithAI = [
             ...updatedMessages,
@@ -141,6 +144,8 @@ export default function Home() {
           } catch {
             // Video reaction is non-critical, don't block the experience
             console.error("Video reaction failed");
+          } finally {
+            setWatchingVideo(false);
           }
         }
       }
@@ -261,6 +266,7 @@ export default function Home() {
           onQuickReply={handleQuickReply}
           model={model}
           onModelChange={setModel}
+          watchingVideo={watchingVideo}
         />
       </div>
 
