@@ -70,7 +70,7 @@ Rules:
           contents: [...historyParts, userTurnWithVideo],
           generationConfig: {
             temperature: 0.8,
-            maxOutputTokens: 512,
+            maxOutputTokens: 1024,
             responseMimeType: "application/json",
             responseSchema: {
               type: "OBJECT",
