@@ -20,10 +20,11 @@ export default function Home() {
   const [watchingVideo, setWatchingVideo] = useState(false);
   const [model, setModel] = useState<"gemini-flash-latest" | "gemini-pro-latest">("gemini-flash-latest");
 
-  const sendMessage = useCallback(async () => {
-    if (!input.trim() || loading) return;
+  const sendMessage = useCallback(async (overrideInput?: string) => {
+    const raw = overrideInput ?? input;
+    if (!raw.trim() || loading) return;
 
-    const userQuery = input.trim();
+    const userQuery = raw.trim();
     const userMessage: Message = { role: "user", content: userQuery };
     const updatedMessages = [...messages, userMessage];
     setMessages(updatedMessages);
@@ -162,10 +163,10 @@ export default function Home() {
 
   const handleQuickReply = useCallback(
     (reply: string) => {
-      // Set input and trigger send on next tick so state is updated
       setInput(reply);
+      sendMessage(reply);
     },
-    []
+    [sendMessage]
   );
 
   const quickQueries = [
