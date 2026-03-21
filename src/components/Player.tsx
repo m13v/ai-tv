@@ -277,7 +277,7 @@ export default function Player({ videoIds, onVideoChange }: PlayerProps) {
 
       {/* Counter — top right */}
       {videoIds.length > 1 && (
-        <div className="absolute top-3 right-3 text-white/70 text-xs bg-black/50 backdrop-blur-sm px-2.5 py-1 rounded-full z-30">
+        <div className="absolute top-[calc(0.75rem+env(safe-area-inset-top))] right-3 text-white/70 text-xs bg-black/50 backdrop-blur-sm px-2.5 py-1 rounded-full z-30">
           {currentIndex + 1}/{videoIds.length}
         </div>
       )}
