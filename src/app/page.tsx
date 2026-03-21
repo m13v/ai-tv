@@ -163,11 +163,11 @@ export default function Home() {
   );
 
   const quickQueries = [
-    "Investigate how AI TV works",
-    "Come up with the best queries",
-    "Show me something mind-blowing",
-    "What's trending right now?",
-    "Surprise me with something weird",
+    "How robots learn to walk",
+    "AI generating photorealistic faces",
+    "Space footage from James Webb telescope",
+    "Slow motion chemistry experiments",
+    "How self-driving cars see the road",
   ];
 
   const handleQuickQuery = (query: string) => {
@@ -189,7 +189,7 @@ export default function Home() {
               AI TV
             </h1>
             <p className="text-neutral-400 text-lg mt-2">
-              Search anything, watch YouTube Shorts
+              AI finds it. You watch it.
             </p>
           </div>
 
