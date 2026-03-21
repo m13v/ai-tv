@@ -284,6 +284,14 @@ export default function Home() {
     }, 0);
   };
 
+  const toggleMobileLayout = useCallback(() => {
+    setMobileOverlay((prev) => {
+      const next = !prev;
+      localStorage.setItem("mobileOverlay", String(next));
+      return next;
+    });
+  }, []);
+
   // Landing page
   if (!hasStarted) {
     return (
@@ -350,16 +358,7 @@ export default function Home() {
     );
   }
 
-  // Desktop: always split (side by side with draggable divider)
-  // Mobile: toggle between split and overlay
-  const toggleMobileLayout = useCallback(() => {
-    setMobileOverlay((prev) => {
-      const next = !prev;
-      localStorage.setItem("mobileOverlay", String(next));
-      return next;
-    });
-  }, []);
-
+  // Desktop: always split. Mobile: toggle between split and overlay.
   return (
     <main
       ref={containerRef}
