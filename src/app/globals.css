@@ -37,12 +37,12 @@ html, body {
   width: 100%;
 }
 .split-chat {
-  height: calc(100% - var(--split) - 12px);
+  height: calc(100% - var(--split) - 24px);
   width: 100%;
 }
 @media (min-width: 768px) {
   .split-video {
-    width: calc(100% - var(--split) - 12px);
+    width: calc(100% - var(--split) - 24px);
     height: 100%;
   }
   .split-chat {
