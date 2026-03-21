@@ -212,16 +212,24 @@ export default function Home() {
 
   // Draggable split
   const [splitPercent, setSplitPercent] = useState(50);
+  const [isMobile, setIsMobile] = useState(false);
   const draggingRef = useRef(false);
   const containerRef = useRef<HTMLElement>(null);
+
+  // Track mobile breakpoint
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
 
   useEffect(() => {
     const onMove = (clientX: number, clientY: number) => {
       if (!draggingRef.current || !containerRef.current) return;
       const rect = containerRef.current.getBoundingClientRect();
-      const isMobile = window.innerWidth < 768;
       let pct: number;
-      if (isMobile) {
+      if (window.innerWidth < 768) {
         pct = ((clientY - rect.top) / rect.height) * 100;
       } else {
         pct = ((clientX - rect.left) / rect.width) * 100;
@@ -345,9 +353,6 @@ export default function Home() {
   // Chat + Video: side by side (desktop) / stacked (mobile)
   // Mobile: video top (splitPercent%), chat bottom
   // Desktop: chat left (splitPercent%), video right
-  const isBrowser = typeof window !== "undefined";
-  const isMobile = isBrowser && window.innerWidth < 768;
-
   return (
     <main ref={containerRef} className="h-screen w-screen bg-black flex flex-col md:flex-row select-none">
       {/* Video — top on mobile, right on desktop */}
