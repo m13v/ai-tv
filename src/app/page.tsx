@@ -298,11 +298,22 @@ export default function Home() {
     );
   }
 
-  // Chat + Video side by side
+  // Chat + Video side by side (desktop) / stacked (mobile)
   return (
-    <main className="h-screen w-screen bg-black flex">
-      {/* Left: Chat — 50% */}
-      <div className="w-1/2 h-full border-r border-neutral-800 flex flex-col">
+    <main className="h-screen w-screen bg-black flex flex-col md:flex-row">
+      {/* Video — top on mobile, right on desktop */}
+      <div className="w-full md:w-1/2 h-1/2 md:h-full md:order-2">
+        {videoIds.length > 0 ? (
+          <Player videoIds={videoIds} onVideoChange={handleVideoChange} />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center text-neutral-400">
+            Loading video...
+          </div>
+        )}
+      </div>
+
+      {/* Chat — bottom on mobile, left on desktop */}
+      <div className="w-full md:w-1/2 h-1/2 md:h-full md:order-1 border-t md:border-t-0 md:border-r border-neutral-800 flex flex-col">
         <Chat
           messages={messages}
           input={input}
@@ -315,17 +326,6 @@ export default function Home() {
           onModelChange={setModel}
           watchingVideo={watchingVideo}
         />
-      </div>
-
-      {/* Right: Video — 50% */}
-      <div className="w-1/2 h-full">
-        {videoIds.length > 0 ? (
-          <Player videoIds={videoIds} onVideoChange={handleVideoChange} />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center text-neutral-400">
-            Loading video...
-          </div>
-        )}
       </div>
     </main>
   );
