@@ -363,15 +363,12 @@ export default function Home() {
         )}
       </div>
 
-      {/* Drag handle */}
+      {/* Drag handle — wide hit area, narrow visual */}
       <div
         className={`group flex items-center justify-center order-2 md:order-2 touch-none transition-all duration-100
-          w-full cursor-row-resize
-          md:h-full md:cursor-col-resize shrink-0
-          ${isDragging
-            ? "h-4 md:w-4 bg-blue-500/30"
-            : "h-3 md:w-3 hover:h-4 md:hover:w-4 hover:bg-white/20"
-          }`}
+          w-full cursor-row-resize h-6
+          md:h-full md:cursor-col-resize md:w-6 shrink-0
+          ${isDragging ? "bg-blue-500/30" : "hover:bg-white/20"}`}
         onMouseDown={startDrag}
         onTouchStart={startDrag}
       >
