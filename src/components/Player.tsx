@@ -149,12 +149,25 @@ export default function Player({ videoIds, onVideoChange }: PlayerProps) {
       }
     };
 
-    const onTouchEnd = () => {
+    const onTouchEnd = (e: TouchEvent) => {
       const { y } = touchDeltaRef.current;
       const threshold = 50;
       if (isSwiping) {
         if (y < -threshold) next();
         else if (y > threshold) prev();
+      } else if (touchStartRef.current) {
+        // It was a tap, not a swipe — pass through to iframe
+        const touch = e.changedTouches[0];
+        el.style.pointerEvents = "none";
+        const target = document.elementFromPoint(touch.clientX, touch.clientY);
+        if (target) {
+          target.dispatchEvent(new MouseEvent("click", {
+            bubbles: true,
+            clientX: touch.clientX,
+            clientY: touch.clientY,
+          }));
+        }
+        requestAnimationFrame(() => { el.style.pointerEvents = ""; });
       }
       touchStartRef.current = null;
       isSwiping = false;
