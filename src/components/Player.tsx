@@ -254,53 +254,26 @@ export default function Player({ videoIds, onVideoChange }: PlayerProps) {
       <div id="yt-player" className="w-full h-full" />
 
 
-      {/* Big unmute button — center */}
-      {muted && (
-        <button
-          onClick={toggleMute}
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 w-20 h-20 flex items-center justify-center rounded-full bg-black/60 backdrop-blur-sm border border-white/20 hover:bg-black/80 hover:scale-105 transition-all cursor-pointer"
-          aria-label="Unmute"
-        >
-          <svg
-            width="32"
-            height="32"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="white"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
+      {/* Mute/Unmute toggle — bottom right, transparent */}
+      <button
+        onClick={toggleMute}
+        className="absolute bottom-3 right-3 z-20 w-9 h-9 flex items-center justify-center rounded-full bg-black/30 backdrop-blur-sm text-white/60 hover:text-white/90 hover:bg-black/50 transition-all cursor-pointer"
+        aria-label={muted ? "Unmute" : "Mute"}
+      >
+        {muted ? (
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
             <line x1="23" y1="9" x2="17" y2="15" />
             <line x1="17" y1="9" x2="23" y2="15" />
           </svg>
-        </button>
-      )}
-
-      {/* Small mute button — top left (shown when unmuted) */}
-      {!muted && (
-        <button
-          onClick={toggleMute}
-          className="absolute top-3 left-3 z-20 w-9 h-9 flex items-center justify-center rounded-full bg-black/50 backdrop-blur-sm text-white/90 hover:text-white hover:bg-black/70 transition-all"
-          aria-label="Mute"
-        >
-          <svg
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
+        ) : (
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
             <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
             <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
           </svg>
-        </button>
-      )}
+        )}
+      </button>
 
       {/* Counter — top right */}
       {videoIds.length > 1 && (
