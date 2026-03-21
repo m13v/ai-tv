@@ -19,7 +19,6 @@ export default function Home() {
   const [suggestedReplies, setSuggestedReplies] = useState<string[]>([]);
   const [watchingVideo, setWatchingVideo] = useState(false);
   const [model, setModel] = useState<"gemini-flash-latest" | "gemini-pro-latest">("gemini-flash-latest");
-  const [chatVisible, setChatVisible] = useState(true);
 
   const sendMessage = useCallback(async (overrideInput?: string) => {
     const raw = overrideInput ?? input;
@@ -379,53 +378,20 @@ export default function Home() {
         />
       </div>
 
-      {/* Chat — overlay on mobile, split panel on desktop */}
-
-      {/* Mobile: chat toggle button */}
-      <button
-        onClick={() => setChatVisible((v) => !v)}
-        className="absolute bottom-4 left-4 z-30 w-11 h-11 flex items-center justify-center rounded-full bg-black/50 backdrop-blur-md border border-white/15 text-white/80 hover:text-white hover:bg-black/70 transition-all cursor-pointer md:hidden"
-        aria-label={chatVisible ? "Hide chat" : "Show chat"}
-      >
-        {chatVisible ? (
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <line x1="18" y1="6" x2="6" y2="18" />
-            <line x1="6" y1="6" x2="18" y2="18" />
-          </svg>
-        ) : (
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-          </svg>
-        )}
-      </button>
-
-      {/* Mobile: chat overlay */}
-      <div
-        className={`absolute z-20 transition-all duration-300 ease-in-out md:hidden
-          ${chatVisible
-            ? "opacity-100 translate-y-0 pointer-events-auto"
-            : "opacity-0 translate-y-4 pointer-events-none"
-          }
-          bottom-0 left-0 right-0 h-[55%]
-        `}
-      >
-        <div className="h-full bg-black/70 backdrop-blur-xl overflow-hidden flex flex-col">
-          <div className="flex justify-center py-2">
-            <div className="w-10 h-1 rounded-full bg-white/30" />
-          </div>
-          <Chat
-            messages={messages}
-            input={input}
-            onInputChange={setInput}
-            onSubmit={sendMessage}
-            loading={loading}
-            suggestedReplies={suggestedReplies}
-            onQuickReply={handleQuickReply}
-            model={model}
-            onModelChange={setModel}
-            watchingVideo={watchingVideo}
-          />
-        </div>
+      {/* Mobile: chat overlay — full height, fully transparent, video shows through */}
+      <div className="absolute inset-0 z-20 md:hidden">
+        <Chat
+          messages={messages}
+          input={input}
+          onInputChange={setInput}
+          onSubmit={sendMessage}
+          loading={loading}
+          suggestedReplies={suggestedReplies}
+          onQuickReply={handleQuickReply}
+          model={model}
+          onModelChange={setModel}
+          watchingVideo={watchingVideo}
+        />
       </div>
 
       {/* Desktop: chat split panel */}
