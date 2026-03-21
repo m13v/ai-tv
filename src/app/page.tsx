@@ -213,6 +213,7 @@ export default function Home() {
   // Draggable split
   const [splitPercent, setSplitPercent] = useState(50);
   const [isMobile, setIsMobile] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
   const draggingRef = useRef(false);
   const containerRef = useRef<HTMLElement>(null);
 
@@ -243,7 +244,7 @@ export default function Home() {
       e.preventDefault();
       onMove(e.touches[0].clientX, e.touches[0].clientY);
     };
-    const onEnd = () => { draggingRef.current = false; };
+    const onEnd = () => { draggingRef.current = false; setIsDragging(false); };
 
     window.addEventListener("mousemove", onMouseMove);
     window.addEventListener("mouseup", onEnd);
@@ -260,6 +261,7 @@ export default function Home() {
   const startDrag = useCallback((e: React.MouseEvent | React.TouchEvent) => {
     e.preventDefault();
     draggingRef.current = true;
+    setIsDragging(true);
   }, []);
 
   const quickQueries = [
