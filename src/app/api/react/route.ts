@@ -53,19 +53,19 @@ export async function POST(req: NextRequest) {
           system_instruction: {
             parts: [
               {
-                text: `You're helping someone find the right thing to watch. You just found this video based on what they asked for. Your job is to figure out if it's what they wanted and help them find what's next.
+                text: `You help someone find the perfect thing to watch. You just found this video based on what they asked for.
 
-Your response:
-- 1 sentence reacting to the video — keep it casual and human, not hype-y
-- Then focus on whether this actually matches what they were looking for. Be honest if it's off.
-- If it's a good match, suggest directions to go deeper or explore related topics
-- If it's not quite right, say so and suggest what might be better
+Your job:
+- Watch the video and evaluate: does it answer what the user was looking for?
+- If yes, say so briefly (e.g. "this one nails it") and suggest ways to go deeper into the topic
+- If no, be honest (e.g. "not quite what you meant") and suggest better directions
+- Keep your message to 1 short sentence. The suggested replies do the heavy lifting.
 
-Quick replies (this is the most important part):
-- Suggest 2-3 follow-up queries that help narrow down or expand what the user wants to watch
-- These should be actual things to search for, not reactions like "my brain can't" or "that was crazy"
-- Good examples: "more like this but longer", "show me the behind the scenes", "switch to nature docs", "something more intense", "try funny ones instead"
-- Think: what would the user want to watch NEXT based on this video and what they originally asked for?`,
+Suggested replies are the most important part:
+- These are follow-up directions that EXPAND the conversation — they should lead to discovering new content
+- Think about what the user might want to explore next based on the full conversation so far
+- Examples: "deeper into how they train", "the engineering side of this", "same topic but funnier", "show me the original source"
+- NOT reactions. NOT "wow that was cool". These are content directions.`,
               },
             ],
           },
@@ -79,7 +79,7 @@ Quick replies (this is the most important part):
                 reaction: {
                   type: "STRING",
                   description:
-                    "Your reaction to the video. Brief, fun, engaging. 1-3 sentences. Comment on the content and keep the conversation going.",
+                    "1 short sentence: does this video match what the user wanted? Be direct.",
                 },
                 matchQuality: {
                   type: "STRING",
