@@ -59,6 +59,7 @@ export default function Player({ videoIds, onVideoChange }: PlayerProps) {
   // Touch/swipe tracking
   const touchStartRef = useRef<{ x: number; y: number } | null>(null);
   const touchDeltaRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
+  const overlayRef = useRef<HTMLDivElement>(null);
 
   // Wheel debounce
   const lastWheelNavRef = useRef(0);
@@ -120,15 +121,18 @@ export default function Player({ videoIds, onVideoChange }: PlayerProps) {
     return () => window.removeEventListener("keydown", handler);
   }, [next, prev]);
 
-  // Touch: swipe up/down (Instagram-style)
+  // Touch: swipe up/down on overlay (iframe eats touch events, so we need an overlay)
   useEffect(() => {
-    const el = containerRef.current;
+    const el = overlayRef.current;
     if (!el) return;
+
+    let isSwiping = false;
 
     const onTouchStart = (e: TouchEvent) => {
       const touch = e.touches[0];
       touchStartRef.current = { x: touch.clientX, y: touch.clientY };
       touchDeltaRef.current = { x: 0, y: 0 };
+      isSwiping = false;
     };
 
     const onTouchMove = (e: TouchEvent) => {
@@ -138,18 +142,25 @@ export default function Player({ videoIds, onVideoChange }: PlayerProps) {
         x: touch.clientX - touchStartRef.current.x,
         y: touch.clientY - touchStartRef.current.y,
       };
-      e.preventDefault();
+      // Once we detect vertical movement, commit to swipe and prevent scroll
+      if (Math.abs(touchDeltaRef.current.y) > 10) {
+        isSwiping = true;
+        e.preventDefault();
+      }
     };
 
     const onTouchEnd = () => {
       const { y } = touchDeltaRef.current;
       const threshold = 50;
-      if (y < -threshold) next();
-      else if (y > threshold) prev();
+      if (isSwiping) {
+        if (y < -threshold) next();
+        else if (y > threshold) prev();
+      }
       touchStartRef.current = null;
+      isSwiping = false;
     };
 
-    el.addEventListener("touchstart", onTouchStart, { passive: false });
+    el.addEventListener("touchstart", onTouchStart, { passive: true });
     el.addEventListener("touchmove", onTouchMove, { passive: false });
     el.addEventListener("touchend", onTouchEnd);
 
@@ -252,6 +263,13 @@ export default function Player({ videoIds, onVideoChange }: PlayerProps) {
     >
       {/* Video */}
       <div id="yt-player" className="w-full h-full" />
+
+      {/* Transparent overlay to capture touch swipes (iframe eats touch events) */}
+      <div
+        ref={overlayRef}
+        className="absolute inset-0 z-10 md:hidden"
+        style={{ touchAction: "none" }}
+      />
 
       {/* Big unmute button — center */}
       {muted && (
