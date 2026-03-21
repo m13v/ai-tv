@@ -356,14 +356,11 @@ export default function Home() {
   // Mobile: video top (splitPercent%), chat bottom
   // Desktop: chat left (splitPercent%), video right
   return (
-    <main ref={containerRef} className="h-screen w-screen bg-black flex flex-col md:flex-row select-none">
+    <main ref={containerRef} className="h-screen w-screen bg-black flex flex-col md:flex-row select-none overflow-hidden">
       {/* Video — top on mobile, right on desktop */}
       <div
-        className="shrink-0 overflow-hidden order-1 md:order-2"
-        style={isMobile
-          ? { height: `calc(${splitPercent}% - 2px)`, width: '100%' }
-          : { width: `calc(${100 - splitPercent}% - 2px)`, height: '100%' }
-        }
+        className="overflow-hidden order-1 md:order-2 min-h-0 min-w-0"
+        style={{ flex: `0 0 ${isMobile ? splitPercent : 100 - splitPercent}%` }}
       >
         {videoIds.length > 0 ? (
           <Player videoIds={videoIds} onVideoChange={handleVideoChange} />
@@ -379,8 +376,8 @@ export default function Home() {
         className={`group shrink-0 flex items-center justify-center order-2 md:order-2 touch-none transition-all duration-150
           cursor-row-resize md:cursor-col-resize
           ${isDragging
-            ? "h-5 md:h-full md:w-5 bg-white/15"
-            : "h-3 md:h-full md:w-3 hover:h-5 md:hover:h-full md:hover:w-5 hover:bg-white/10"
+            ? "h-5 md:h-auto md:w-5 bg-white/15"
+            : "h-3 md:h-auto md:w-3 hover:h-5 md:hover:w-5 hover:bg-white/10"
           }`}
         onMouseDown={startDrag}
         onTouchStart={startDrag}
@@ -395,11 +392,8 @@ export default function Home() {
 
       {/* Chat — bottom on mobile, left on desktop */}
       <div
-        className="shrink-0 overflow-hidden flex flex-col order-3 md:order-1"
-        style={isMobile
-          ? { height: `calc(${100 - splitPercent}% - 2px)`, width: '100%' }
-          : { width: `calc(${splitPercent}% - 2px)`, height: '100%' }
-        }
+        className="overflow-hidden flex flex-col order-3 md:order-1 min-h-0 min-w-0"
+        style={{ flex: `0 0 ${isMobile ? 100 - splitPercent : splitPercent}%` }}
       >
         <Chat
           messages={messages}
