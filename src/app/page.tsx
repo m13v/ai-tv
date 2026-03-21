@@ -170,10 +170,15 @@ export default function Home() {
 
   const quickQueries = [
     "How robots learn to walk",
-    "AI generating photorealistic faces",
     "Space footage from James Webb telescope",
-    "Slow motion chemistry experiments",
-    "How self-driving cars see the road",
+    "Satisfying food preparation",
+    "Craziest animal encounters",
+    "Optical illusions that break your brain",
+    "Underground street performances",
+    "Tiny homes and creative spaces",
+    "Extreme weather caught on camera",
+    "Life hacks that actually work",
+    "Behind the scenes of movie stunts",
   ];
 
   const handleQuickQuery = (query: string) => {
