@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 interface PlayerProps {
   videoIds: string[];
+  onVideoChange?: (videoId: string, index: number) => void;
 }
 
 declare global {
@@ -45,7 +46,7 @@ interface YTPlayer {
   destroy: () => void;
 }
 
-export default function Player({ videoIds }: PlayerProps) {
+export default function Player({ videoIds, onVideoChange }: PlayerProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [muted, setMuted] = useState(true);
   const mutedRef = useRef(true);
@@ -64,12 +65,16 @@ export default function Player({ videoIds }: PlayerProps) {
 
   videoIdsRef.current = videoIds;
 
+  const onVideoChangeRef = useRef(onVideoChange);
+  onVideoChangeRef.current = onVideoChange;
+
   const goTo = useCallback((index: number) => {
     if (index < 0 || index >= videoIdsRef.current.length) return;
     if (index === currentIndexRef.current) return;
     playerRef.current?.loadVideoById(videoIdsRef.current[index]);
     currentIndexRef.current = index;
     setCurrentIndex(index);
+    onVideoChangeRef.current?.(videoIdsRef.current[index], index);
   }, []);
 
   const next = useCallback(() => {
