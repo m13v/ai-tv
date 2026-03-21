@@ -432,6 +432,7 @@ export default function Home() {
             model={model}
             onModelChange={setModel}
             watchingVideo={watchingVideo}
+            overlay
           />
         </div>
       )}
