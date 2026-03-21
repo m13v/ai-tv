@@ -46,5 +46,7 @@ jobs:
         run: |
           url=$(vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }})
           echo "url=$url" >> "$GITHUB_OUTPUT"
+          vercel alias set "$url" staging-vidq.vercel.app --token=${{ secrets.VERCEL_TOKEN }} --scope=${{ secrets.VERCEL_ORG_ID }}
           echo "### Preview Deployment" >> "$GITHUB_STEP_SUMMARY"
-          echo "URL: $url" >> "$GITHUB_STEP_SUMMARY"
+          echo "Preview: $url" >> "$GITHUB_STEP_SUMMARY"
+          echo "Staging: https://staging-vidq.vercel.app" >> "$GITHUB_STEP_SUMMARY"
