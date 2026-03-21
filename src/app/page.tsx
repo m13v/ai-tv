@@ -376,21 +376,20 @@ export default function Home() {
 
       {/* Drag handle */}
       <div
-        className={`shrink-0 flex items-center justify-center order-2 md:order-2 touch-none transition-colors duration-150
-          h-1.5 cursor-row-resize
-          md:h-full md:w-1.5 md:cursor-col-resize
+        className={`group shrink-0 flex items-center justify-center order-2 md:order-2 touch-none transition-all duration-150
+          h-3 cursor-row-resize
+          md:h-full md:w-3 md:cursor-col-resize
           ${isDragging
-            ? "bg-blue-500/30"
-            : "bg-neutral-900 hover:bg-neutral-700"
+            ? "bg-blue-500/40"
+            : "bg-neutral-800 hover:bg-neutral-600"
           }`}
         onMouseDown={startDrag}
         onTouchStart={startDrag}
       >
         <div className={`rounded-full transition-all duration-150
-          w-12 h-1 md:w-1 md:h-12
           ${isDragging
-            ? "bg-blue-400 w-16 md:w-1 md:h-16 scale-110"
-            : "bg-neutral-500 group-hover:bg-neutral-300"
+            ? "bg-blue-400 w-20 h-1.5 md:w-1.5 md:h-20"
+            : "bg-neutral-500 group-hover:bg-white w-12 h-1 md:w-1 md:h-12 group-hover:w-16 group-hover:h-1.5 md:group-hover:w-1.5 md:group-hover:h-16"
           }`}
         />
       </div>
