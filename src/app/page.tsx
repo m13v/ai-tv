@@ -22,6 +22,18 @@ export default function Home() {
   const [mobileOverlay, setMobileOverlay] = useState(true);
   const [showMessages, setShowMessages] = useState(true);
   const [showControls, setShowControls] = useState(true);
+  const [tapShield, setTapShield] = useState(false);
+
+  const handleOverlayTap = useCallback(() => {
+    setShowControls((prev) => {
+      if (prev) {
+        // Hiding overlay — put up a shield so the tap doesn't hit YouTube
+        setTapShield(true);
+        setTimeout(() => setTapShield(false), 400);
+      }
+      return !prev;
+    });
+  }, []);
 
   // Load mobile layout preference
   useEffect(() => {
@@ -465,12 +477,16 @@ export default function Home() {
             overlay
             showMessages={showMessages}
             showControls={showControls}
-            onTapBackground={() => setShowControls((v) => !v)}
+            onTapBackground={handleOverlayTap}
           />
         </div>
       )}
+      {/* Shield to absorb tap when hiding overlay — prevents YouTube from also toggling */}
+      {tapShield && (
+        <div className="absolute inset-0 z-20 md:hidden" />
+      )}
       {/* Tap zone to bring overlay back when hidden */}
-      {!showControls && mobileOverlay && (
+      {!showControls && !tapShield && mobileOverlay && (
         <div
           className="absolute inset-0 z-20 md:hidden"
           onClick={() => setShowControls(true)}
