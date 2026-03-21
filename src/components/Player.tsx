@@ -1,11 +1,16 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from "react";
 
 interface PlayerProps {
   videoIds: string[];
   onVideoChange?: (videoId: string, index: number) => void;
   hideControls?: boolean;
+  onMuteChange?: (muted: boolean) => void;
+}
+
+export interface PlayerHandle {
+  toggleMute: () => void;
 }
 
 declare global {
@@ -47,7 +52,7 @@ interface YTPlayer {
   destroy: () => void;
 }
 
-export default function Player({ videoIds, onVideoChange, hideControls }: PlayerProps) {
+const Player = forwardRef<PlayerHandle, PlayerProps>(function Player({ videoIds, onVideoChange, hideControls, onMuteChange }, ref) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [muted, setMuted] = useState(true);
   const mutedRef = useRef(true);
@@ -97,8 +102,13 @@ export default function Player({ videoIds, onVideoChange, hideControls }: Player
       const newMuted = !muted;
       setMuted(newMuted);
       mutedRef.current = newMuted;
+      onMuteChange?.(newMuted);
     }
-  }, [muted]);
+  }, [muted, onMuteChange]);
+
+  useImperativeHandle(ref, () => ({
+    toggleMute,
+  }), [toggleMute]);
 
   // Keyboard: up/down arrows only (left/right reserved for YouTube seek)
   useEffect(() => {
@@ -255,11 +265,11 @@ export default function Player({ videoIds, onVideoChange, hideControls }: Player
       <div id="yt-player" className="w-full h-full" />
 
 
-      {/* Mute/Unmute toggle — above chat controls on mobile, bottom-right on desktop */}
+      {/* Mute/Unmute toggle — desktop only (mobile mute is in page.tsx top-left bar) */}
       {!hideControls && (
         <button
           onClick={toggleMute}
-          className="absolute top-[calc(0.75rem+env(safe-area-inset-top))] right-3 md:bottom-3 md:top-auto z-30 w-9 h-9 flex items-center justify-center rounded-full bg-black/40 backdrop-blur-sm text-white/60 hover:text-white/90 hover:bg-black/60 transition-all cursor-pointer"
+          className="hidden md:flex absolute bottom-3 right-3 z-30 w-9 h-9 items-center justify-center rounded-full bg-black/40 backdrop-blur-sm text-white/60 hover:text-white/90 hover:bg-black/60 transition-all cursor-pointer"
           aria-label={muted ? "Unmute" : "Mute"}
         >
           {muted ? (
@@ -326,4 +336,6 @@ export default function Player({ videoIds, onVideoChange, hideControls }: Player
       )}
     </div>
   );
-}
+});
+
+export default Player;
