@@ -426,6 +426,26 @@ export default function Home() {
           )}
         </button>
       )}
+      {/* Mobile: new session button — in line with top-left buttons (overlay mode) */}
+      {mobileOverlay && showControls && (
+        <button
+          onClick={() => {
+            setHasStarted(false);
+            setMessages([]);
+            setVideoIds([]);
+            setInput("");
+            setSuggestedReplies([]);
+            setWatchingVideo(false);
+          }}
+          className="absolute top-[calc(0.75rem+env(safe-area-inset-top))] left-[9rem] z-30 w-9 h-9 flex items-center justify-center rounded-full bg-black/40 backdrop-blur-sm text-white/60 hover:text-white hover:bg-black/60 transition-all cursor-pointer md:hidden"
+          aria-label="New session"
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19" />
+            <line x1="5" y1="12" x2="19" y2="12" />
+          </svg>
+        </button>
+      )}
       {/* Mobile: layout toggle in split mode */}
       {!mobileOverlay && (
         <button
@@ -436,6 +456,26 @@ export default function Home() {
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <rect x="3" y="3" width="18" height="18" rx="2" />
             <rect x="8" y="8" width="13" height="13" rx="1" />
+          </svg>
+        </button>
+      )}
+      {/* Mobile: new session button in split mode */}
+      {!mobileOverlay && (
+        <button
+          onClick={() => {
+            setHasStarted(false);
+            setMessages([]);
+            setVideoIds([]);
+            setInput("");
+            setSuggestedReplies([]);
+            setWatchingVideo(false);
+          }}
+          className="absolute top-[calc(0.75rem+env(safe-area-inset-top))] left-14 z-30 w-9 h-9 flex items-center justify-center rounded-full bg-black/40 backdrop-blur-sm text-white/60 hover:text-white hover:bg-black/60 transition-all cursor-pointer md:hidden"
+          aria-label="New session"
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19" />
+            <line x1="5" y1="12" x2="19" y2="12" />
           </svg>
         </button>
       )}
