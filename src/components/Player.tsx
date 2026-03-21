@@ -259,7 +259,7 @@ export default function Player({ videoIds, onVideoChange, hideControls }: Player
       {!hideControls && (
         <button
           onClick={toggleMute}
-          className="absolute bottom-[22%] right-3 md:bottom-3 z-30 w-9 h-9 flex items-center justify-center rounded-full bg-black/30 backdrop-blur-sm text-white/60 hover:text-white/90 hover:bg-black/50 transition-all cursor-pointer"
+          className="absolute top-[calc(0.75rem+env(safe-area-inset-top))] right-3 md:bottom-3 md:top-auto z-30 w-9 h-9 flex items-center justify-center rounded-full bg-black/40 backdrop-blur-sm text-white/60 hover:text-white/90 hover:bg-black/60 transition-all cursor-pointer"
           aria-label={muted ? "Unmute" : "Mute"}
         >
           {muted ? (
