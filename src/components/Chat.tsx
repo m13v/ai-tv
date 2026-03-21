@@ -7,6 +7,8 @@ interface Message {
   content: string;
 }
 
+type GeminiModel = "gemini-flash-latest" | "gemini-pro-latest";
+
 interface ChatProps {
   messages: Message[];
   input: string;
@@ -15,6 +17,9 @@ interface ChatProps {
   loading: boolean;
   suggestedReplies?: string[];
   onQuickReply?: (reply: string) => void;
+  model: GeminiModel;
+  onModelChange: (model: GeminiModel) => void;
+  watchingVideo?: boolean;
 }
 
 export default function Chat({
@@ -25,14 +30,17 @@ export default function Chat({
   loading,
   suggestedReplies,
   onQuickReply,
+  model,
+  onModelChange,
+  watchingVideo,
 }: ChatProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Auto-scroll to bottom on new messages
+  // Auto-scroll to bottom on new messages or watching state
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+  }, [messages, watchingVideo]);
 
   // Refocus input after response completes
   useEffect(() => {
@@ -92,6 +100,13 @@ export default function Chat({
             </div>
           </div>
         )}
+        {watchingVideo && !loading && (
+          <div className="flex justify-start">
+            <div className="bg-neutral-800 text-white/60 rounded-2xl rounded-bl-md px-4 py-2.5 text-sm italic">
+              Watching video...
+            </div>
+          </div>
+        )}
         <div ref={messagesEndRef} />
       </div>
 
@@ -110,8 +125,24 @@ export default function Chat({
         </div>
       )}
 
-      {/* Input */}
+      {/* Model toggle + Input */}
       <div className="border-t border-neutral-800 px-4 py-3">
+        <div className="flex items-center gap-1 mb-2">
+          <span className="text-[10px] text-neutral-500 mr-1">Model:</span>
+          {(["gemini-flash-latest", "gemini-pro-latest"] as const).map((m) => (
+            <button
+              key={m}
+              onClick={() => onModelChange(m)}
+              className={`text-[11px] px-2 py-0.5 rounded-full transition-colors ${
+                model === m
+                  ? "bg-white/15 text-white border border-white/20"
+                  : "text-neutral-500 hover:text-neutral-300 border border-transparent"
+              }`}
+            >
+              {m === "gemini-flash-latest" ? "Flash" : "Pro"}
+            </button>
+          ))}
+        </div>
         <div className="flex gap-2">
           <div className="relative flex-1">
             <input
