@@ -297,7 +297,7 @@ export default function Home() {
   // Landing page
   if (!hasStarted) {
     return (
-      <main className="h-screen w-screen flex flex-col items-center justify-center bg-black px-4">
+      <main className="h-dvh w-screen flex flex-col items-center justify-center bg-black px-4">
         <div className="w-full max-w-lg flex flex-col items-center gap-6">
           <div className="text-center mb-2">
             <h1 className="text-5xl font-bold text-white tracking-tight">
@@ -364,13 +364,13 @@ export default function Home() {
   return (
     <main
       ref={containerRef}
-      className={`h-screen w-screen bg-black select-none overflow-hidden relative md:flex md:flex-row ${
+      className={`h-dvh w-screen bg-black select-none overflow-hidden relative md:flex md:flex-row ${
         !mobileOverlay ? "flex flex-col" : ""
       }`}
       style={{ "--split": `${splitPercent}%` } as React.CSSProperties}
     >
       {/* Mobile controls — only visible on mobile */}
-      <div className="absolute top-3 left-3 z-30 flex gap-2 md:hidden">
+      <div className="absolute top-[calc(0.75rem+env(safe-area-inset-top))] left-3 z-30 flex gap-2 md:hidden">
         {/* Layout toggle */}
         <button
           onClick={toggleMobileLayout}
