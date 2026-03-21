@@ -74,8 +74,8 @@ export default function Chat({
             <div
               className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${
                 msg.role === "user"
-                  ? "bg-white text-black rounded-br-md"
-                  : "bg-neutral-800 text-white rounded-bl-md"
+                  ? "bg-white text-black rounded-br-md md:bg-white md:text-black bg-white/90"
+                  : "bg-black/50 backdrop-blur-md text-white rounded-bl-md md:bg-neutral-800 md:backdrop-blur-none"
               }`}
             >
               {msg.content}
@@ -84,7 +84,7 @@ export default function Chat({
         ))}
         {loading && (
           <div className="flex justify-start">
-            <div className="bg-neutral-800 text-white/80 rounded-2xl rounded-bl-md px-4 py-2.5 text-sm">
+            <div className="bg-black/50 backdrop-blur-md md:bg-neutral-800 md:backdrop-blur-none text-white/80 rounded-2xl rounded-bl-md px-4 py-2.5 text-sm">
               <span className="inline-flex gap-1">
                 <span className="animate-bounce" style={{ animationDelay: "0ms" }}>.</span>
                 <span className="animate-bounce" style={{ animationDelay: "150ms" }}>.</span>
@@ -95,7 +95,7 @@ export default function Chat({
         )}
         {watchingVideo && !loading && (
           <div className="flex justify-start">
-            <div className="bg-neutral-800 text-white/60 rounded-2xl rounded-bl-md px-4 py-2.5 text-sm italic">
+            <div className="bg-black/50 backdrop-blur-md md:bg-neutral-800 md:backdrop-blur-none text-white/60 rounded-2xl rounded-bl-md px-4 py-2.5 text-sm italic">
               Watching video
               <span className="inline-flex gap-0.5 ml-0.5">
                 <span className="animate-bounce" style={{ animationDelay: "0ms" }}>.</span>
@@ -115,7 +115,7 @@ export default function Chat({
             <button
               key={i}
               onClick={() => onQuickReply?.(reply)}
-              className="bg-neutral-800 hover:bg-neutral-700 text-white text-sm px-3 py-1.5 rounded-full border border-neutral-700 hover:border-neutral-500 transition-colors whitespace-nowrap shrink-0"
+              className="bg-black/50 backdrop-blur-md md:bg-neutral-800 md:backdrop-blur-none hover:bg-neutral-700 text-white text-sm px-3 py-1.5 rounded-full border border-white/20 md:border-neutral-700 hover:border-neutral-500 transition-colors whitespace-nowrap shrink-0"
             >
               {reply}
             </button>
@@ -124,7 +124,7 @@ export default function Chat({
       )}
 
       {/* Model toggle + Input */}
-      <div className="border-t border-white/10 px-4 py-3">
+      <div className="border-t border-white/10 px-4 py-3 md:border-neutral-800">
         <div className="flex items-center gap-1 mb-2">
           <span className="text-[10px] text-neutral-500 mr-1">Model:</span>
           {(["gemini-flash-latest", "gemini-pro-latest"] as const).map((m) => (
@@ -156,7 +156,7 @@ export default function Chat({
               value={input}
               onChange={(e) => onInputChange(e.target.value)}
               placeholder="Ask something or describe what to watch next..."
-              className="w-full bg-neutral-900 border border-neutral-700 rounded-full px-4 py-2.5 pr-16 text-white placeholder-neutral-400 focus:outline-none focus:border-neutral-600 text-sm text-[16px] md:text-sm"
+              className="w-full bg-black/50 backdrop-blur-md md:bg-neutral-900 md:backdrop-blur-none border border-white/20 md:border-neutral-700 rounded-full px-4 py-2.5 pr-16 text-white placeholder-neutral-400 focus:outline-none focus:border-white/40 md:focus:border-neutral-600 text-sm text-[16px] md:text-sm"
               disabled={loading}
               autoFocus
             />
