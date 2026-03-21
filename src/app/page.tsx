@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, FormEvent } from "react";
+import { useState, FormEvent, useCallback } from "react";
 import Player from "@/components/Player";
 
 export default function Home() {
@@ -8,100 +8,106 @@ export default function Home() {
   const [videoIds, setVideoIds] = useState<string[]>([]);
   const [activeQuery, setActiveQuery] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [hasSearched, setHasSearched] = useState(false);
 
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
-    if (!query.trim()) return;
+  const handleSubmit = useCallback(
+    async (e?: FormEvent) => {
+      e?.preventDefault();
+      if (!query.trim()) return;
 
-    setLoading(true);
-    setError("");
-    setVideoIds([]);
+      setLoading(true);
+      setVideoIds([]);
 
-    try {
-      // Step 1: Optimize query with Gemini
-      const optimizeRes = await fetch("/api/optimize", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ query: query.trim() }),
-      });
-      const { searchQuery } = await optimizeRes.json();
+      try {
+        const optimizeRes = await fetch("/api/optimize", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ query: query.trim() }),
+        });
+        const { searchQuery } = await optimizeRes.json();
 
-      // Step 2: Search YouTube for Shorts
-      const searchRes = await fetch("/api/search", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ query: searchQuery }),
-      });
-      const { videoIds: ids } = await searchRes.json();
+        const searchRes = await fetch("/api/search", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ query: searchQuery }),
+        });
+        const { videoIds: ids } = await searchRes.json();
 
-      if (!ids || ids.length === 0) {
-        setError("No Shorts found. Try a different search.");
+        if (ids?.length > 0) {
+          setVideoIds(ids);
+          setActiveQuery(searchQuery);
+          setHasSearched(true);
+        }
+      } catch {
+        // silently fail
+      } finally {
         setLoading(false);
-        return;
       }
+    },
+    [query]
+  );
 
-      setVideoIds(ids);
-      setActiveQuery(searchQuery);
-    } catch {
-      setError("Something went wrong. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
+  // Initial landing — just a centered search bar
+  if (!hasSearched) {
+    return (
+      <main className="h-screen w-screen flex flex-col items-center justify-center bg-black px-4">
+        <form onSubmit={handleSubmit} className="w-full max-w-lg">
+          <div className="flex gap-2">
+            <input
+              type="text"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="What do you want to watch?"
+              className="flex-1 bg-neutral-900/80 backdrop-blur border border-neutral-700 rounded-full px-6 py-4 text-white placeholder-neutral-500 focus:outline-none focus:border-neutral-500 text-lg"
+              disabled={loading}
+              autoFocus
+            />
+            <button
+              type="submit"
+              disabled={loading || !query.trim()}
+              className="bg-white text-black font-semibold px-6 py-4 rounded-full hover:bg-neutral-200 disabled:opacity-40 disabled:cursor-not-allowed transition-colors text-lg"
+            >
+              {loading ? "..." : "Watch"}
+            </button>
+          </div>
+        </form>
+      </main>
+    );
+  }
 
+  // Playing — fullscreen video with overlay search
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center px-4 py-8">
-      {/* Header */}
-      <div className="mb-8 text-center">
-        <h1 className="text-5xl font-bold tracking-tight mb-2">AI TV</h1>
-        <p className="text-neutral-500 text-lg">
-          Describe what you want to watch
-        </p>
+    <main className="h-screen w-screen bg-black overflow-hidden relative">
+      <Player
+        videoIds={videoIds}
+        query={activeQuery}
+        onNewSearch={(q) => {
+          setQuery(q);
+        }}
+      />
+
+      {/* Overlay search bar at bottom */}
+      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 w-full max-w-lg px-4 z-20">
+        <form onSubmit={handleSubmit}>
+          <div className="flex gap-2">
+            <input
+              type="text"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Search something else..."
+              className="flex-1 bg-black/50 backdrop-blur-md border border-white/20 rounded-full px-5 py-3 text-white placeholder-white/40 focus:outline-none focus:border-white/40 text-base"
+              disabled={loading}
+            />
+            <button
+              type="submit"
+              disabled={loading || !query.trim()}
+              className="bg-white/20 backdrop-blur-md text-white font-medium px-5 py-3 rounded-full hover:bg-white/30 disabled:opacity-30 disabled:cursor-not-allowed transition-colors text-base border border-white/20"
+            >
+              {loading ? "..." : "Go"}
+            </button>
+          </div>
+        </form>
       </div>
-
-      {/* Search */}
-      <form
-        onSubmit={handleSubmit}
-        className="w-full max-w-lg mb-8"
-      >
-        <div className="flex gap-2">
-          <input
-            type="text"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="e.g. funny cats, cooking hacks, skateboard tricks..."
-            className="flex-1 bg-neutral-900 border border-neutral-700 rounded-xl px-5 py-3.5 text-white placeholder-neutral-500 focus:outline-none focus:border-neutral-500 focus:ring-1 focus:ring-neutral-500 text-lg"
-            disabled={loading}
-            autoFocus
-          />
-          <button
-            type="submit"
-            disabled={loading || !query.trim()}
-            className="bg-white text-black font-semibold px-6 py-3.5 rounded-xl hover:bg-neutral-200 disabled:opacity-40 disabled:cursor-not-allowed transition-colors text-lg"
-          >
-            {loading ? "..." : "Watch"}
-          </button>
-        </div>
-      </form>
-
-      {/* Error */}
-      {error && (
-        <p className="text-red-400 mb-4 text-center">{error}</p>
-      )}
-
-      {/* Player */}
-      {videoIds.length > 0 && (
-        <Player videoIds={videoIds} query={activeQuery} />
-      )}
-
-      {/* Empty state */}
-      {!videoIds.length && !loading && !error && (
-        <div className="text-neutral-600 text-center mt-8">
-          <p className="text-6xl mb-4">&#128250;</p>
-          <p>Enter a prompt to start watching</p>
-        </div>
-      )}
     </main>
   );
 }

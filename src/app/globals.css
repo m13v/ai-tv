@@ -5,8 +5,19 @@
   --foreground: #ffffff;
 }
 
-body {
+html, body {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
   background: var(--background);
   color: var(--foreground);
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  height: 100%;
+  width: 100%;
+}
+
+/* Make YouTube iframe fill container */
+#yt-player iframe {
+  width: 100% !important;
+  height: 100% !important;
 }
