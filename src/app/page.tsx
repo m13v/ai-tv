@@ -376,13 +376,23 @@ export default function Home() {
 
       {/* Drag handle */}
       <div
-        className="shrink-0 flex items-center justify-center bg-neutral-900 order-2 md:order-2 touch-none
-          h-1 cursor-row-resize border-y border-neutral-700
-          md:h-full md:w-1 md:cursor-col-resize md:border-x md:border-y-0"
+        className={`shrink-0 flex items-center justify-center order-2 md:order-2 touch-none transition-colors duration-150
+          h-1.5 cursor-row-resize
+          md:h-full md:w-1.5 md:cursor-col-resize
+          ${isDragging
+            ? "bg-blue-500/30"
+            : "bg-neutral-900 hover:bg-neutral-700"
+          }`}
         onMouseDown={startDrag}
         onTouchStart={startDrag}
       >
-        <div className="w-10 h-0.5 md:w-0.5 md:h-10 rounded-full bg-neutral-500" />
+        <div className={`rounded-full transition-all duration-150
+          w-12 h-1 md:w-1 md:h-12
+          ${isDragging
+            ? "bg-blue-400 w-16 md:w-1 md:h-16 scale-110"
+            : "bg-neutral-500 group-hover:bg-neutral-300"
+          }`}
+        />
       </div>
 
       {/* Chat — bottom on mobile, left on desktop */}
