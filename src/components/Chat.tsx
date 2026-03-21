@@ -123,7 +123,7 @@ export default function Chat({
       </div>
 
       {/* Bottom: suggested replies + input — pushed up on mobile overlay to clear YouTube timeline */}
-      <div className={overlay ? "pointer-events-auto pb-12" : ""}>
+      <div className={overlay ? "pointer-events-auto pb-16" : ""}>
         {/* Suggested replies */}
         {suggestedReplies && suggestedReplies.length > 0 && !loading && (
           <div className="px-4 pb-2 flex gap-2 overflow-x-auto md:flex-wrap md:overflow-x-visible scrollbar-none">
