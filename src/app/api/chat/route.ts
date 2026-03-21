@@ -6,7 +6,8 @@ interface Message {
 }
 
 export async function POST(req: NextRequest) {
-  const { messages } = (await req.json()) as { messages: Message[] };
+  const { messages, model } = (await req.json()) as { messages: Message[]; model?: string };
+  const geminiModel = model === "gemini-pro-latest" ? "gemini-pro-latest" : "gemini-flash-latest";
 
   if (!messages?.length) {
     return NextResponse.json({ error: "messages required" }, { status: 400 });
@@ -25,7 +26,7 @@ export async function POST(req: NextRequest) {
 
   try {
     const res = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro-latest:generateContent?key=${apiKey}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/${geminiModel}:generateContent?key=${apiKey}`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
