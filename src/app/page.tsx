@@ -161,6 +161,47 @@ export default function Home() {
     }
   }, [input, messages, loading, hasStarted, model]);
 
+  const handleVideoChange = useCallback(async (videoId: string) => {
+    if (watchingVideo) return; // Don't stack reactions
+    setWatchingVideo(true);
+    setSuggestedReplies([]);
+
+    try {
+      const reactRes = await fetch("/api/react", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          messages,
+          videoId,
+        }),
+      });
+      const {
+        reaction,
+        matchQuality,
+        suggestedReplies: suggestions,
+      } = await reactRes.json();
+
+      if (reaction) {
+        setMessages((prev) => [
+          ...prev,
+          { role: "assistant", content: reaction },
+        ]);
+        if (suggestions?.length > 0) {
+          setSuggestedReplies(suggestions);
+        }
+        posthog.capture("video_reaction", {
+          video_id: videoId,
+          match_quality: matchQuality,
+          trigger: "video_change",
+        });
+      }
+    } catch {
+      console.error("Video reaction failed on video change");
+    } finally {
+      setWatchingVideo(false);
+    }
+  }, [messages, watchingVideo]);
+
   const handleQuickReply = useCallback(
     (reply: string) => {
       setInput(reply);
@@ -279,7 +320,7 @@ export default function Home() {
       {/* Right: Video — 50% */}
       <div className="w-1/2 h-full">
         {videoIds.length > 0 ? (
-          <Player videoIds={videoIds} />
+          <Player videoIds={videoIds} onVideoChange={handleVideoChange} />
         ) : (
           <div className="w-full h-full flex items-center justify-center text-neutral-400">
             Loading video...
