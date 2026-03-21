@@ -137,6 +137,7 @@ export default function Chat({
           {(["gemini-flash-latest", "gemini-pro-latest"] as const).map((m) => (
             <button
               key={m}
+              type="button"
               onClick={() => onModelChange(m)}
               className={`text-[11px] px-2 py-0.5 rounded-full transition-colors ${
                 model === m
@@ -148,14 +149,19 @@ export default function Chat({
             </button>
           ))}
         </div>
-        <div className="flex gap-2">
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            onSubmit();
+          }}
+          className="flex gap-2"
+        >
           <div className="relative flex-1">
             <input
               ref={inputRef}
               type="text"
               value={input}
               onChange={(e) => onInputChange(e.target.value)}
-              onKeyDown={handleKeyDown}
               placeholder="Ask something or describe what to watch next..."
               className="w-full bg-neutral-900 border border-neutral-700 rounded-full px-4 py-2.5 pr-16 text-white placeholder-neutral-400 focus:outline-none focus:border-neutral-600 text-sm text-[16px] md:text-sm"
               disabled={loading}
@@ -171,13 +177,13 @@ export default function Chat({
             </div>
           </div>
           <button
-            onClick={onSubmit}
+            type="submit"
             disabled={loading || !input.trim()}
             className="bg-white text-black font-medium px-4 py-2.5 rounded-full hover:bg-neutral-200 disabled:opacity-30 disabled:cursor-not-allowed transition-colors text-sm"
           >
             Send
           </button>
-        </div>
+        </form>
       </div>
     </div>
   );
