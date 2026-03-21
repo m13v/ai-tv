@@ -21,6 +21,7 @@ export default function Home() {
   const [model, setModel] = useState<"gemini-flash-latest" | "gemini-pro-latest">("gemini-flash-latest");
   const [mobileOverlay, setMobileOverlay] = useState(true);
   const [showMessages, setShowMessages] = useState(true);
+  const [showControls, setShowControls] = useState(true);
 
   // Load mobile layout preference
   useEffect(() => {
