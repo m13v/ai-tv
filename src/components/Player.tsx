@@ -254,10 +254,10 @@ export default function Player({ videoIds, onVideoChange }: PlayerProps) {
       <div id="yt-player" className="w-full h-full" />
 
 
-      {/* Mute/Unmute toggle — bottom right, transparent */}
+      {/* Mute/Unmute toggle — above chat controls on mobile, bottom-right on desktop */}
       <button
         onClick={toggleMute}
-        className="absolute bottom-3 right-3 z-20 w-9 h-9 flex items-center justify-center rounded-full bg-black/30 backdrop-blur-sm text-white/60 hover:text-white/90 hover:bg-black/50 transition-all cursor-pointer"
+        className="absolute bottom-[22%] right-3 md:bottom-3 z-20 w-9 h-9 flex items-center justify-center rounded-full bg-black/30 backdrop-blur-sm text-white/60 hover:text-white/90 hover:bg-black/50 transition-all cursor-pointer"
         aria-label={muted ? "Unmute" : "Mute"}
       >
         {muted ? (
