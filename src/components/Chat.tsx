@@ -20,6 +20,7 @@ interface ChatProps {
   model: GeminiModel;
   onModelChange: (model: GeminiModel) => void;
   watchingVideo?: boolean;
+  overlay?: boolean;
 }
 
 export default function Chat({
@@ -33,6 +34,7 @@ export default function Chat({
   model,
   onModelChange,
   watchingVideo,
+  overlay,
 }: ChatProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
