@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import posthog from "posthog-js";
 import Player from "@/components/Player";
 import Chat from "@/components/Chat";
@@ -209,6 +209,50 @@ export default function Home() {
     },
     [sendMessage]
   );
+
+  // Draggable split
+  const [splitPercent, setSplitPercent] = useState(50);
+  const draggingRef = useRef(false);
+  const containerRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    const onMove = (clientX: number, clientY: number) => {
+      if (!draggingRef.current || !containerRef.current) return;
+      const rect = containerRef.current.getBoundingClientRect();
+      const isMobile = window.innerWidth < 768;
+      let pct: number;
+      if (isMobile) {
+        pct = ((clientY - rect.top) / rect.height) * 100;
+      } else {
+        pct = ((clientX - rect.left) / rect.width) * 100;
+      }
+      setSplitPercent(Math.min(80, Math.max(20, pct)));
+    };
+
+    const onMouseMove = (e: MouseEvent) => onMove(e.clientX, e.clientY);
+    const onTouchMove = (e: TouchEvent) => {
+      if (!draggingRef.current) return;
+      e.preventDefault();
+      onMove(e.touches[0].clientX, e.touches[0].clientY);
+    };
+    const onEnd = () => { draggingRef.current = false; };
+
+    window.addEventListener("mousemove", onMouseMove);
+    window.addEventListener("mouseup", onEnd);
+    window.addEventListener("touchmove", onTouchMove, { passive: false });
+    window.addEventListener("touchend", onEnd);
+    return () => {
+      window.removeEventListener("mousemove", onMouseMove);
+      window.removeEventListener("mouseup", onEnd);
+      window.removeEventListener("touchmove", onTouchMove);
+      window.removeEventListener("touchend", onEnd);
+    };
+  }, []);
+
+  const startDrag = useCallback((e: React.MouseEvent | React.TouchEvent) => {
+    e.preventDefault();
+    draggingRef.current = true;
+  }, []);
 
   const quickQueries = [
     "How robots learn to walk",
