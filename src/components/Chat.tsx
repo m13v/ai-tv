@@ -21,6 +21,7 @@ interface ChatProps {
   onModelChange: (model: GeminiModel) => void;
   watchingVideo?: boolean;
   overlay?: boolean;
+  showMessages?: boolean;
 }
 
 export default function Chat({
@@ -35,6 +36,7 @@ export default function Chat({
   onModelChange,
   watchingVideo,
   overlay,
+  showMessages = true,
 }: ChatProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -68,56 +70,60 @@ export default function Chat({
     <div className={`flex flex-col h-full ${overlay ? "pointer-events-none" : ""}`}>
       {/* Messages */}
       <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4">
-        {messages.map((msg, i) => (
-          <div
-            key={i}
-            className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
-          >
-            <div
-              className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${
-                msg.role === "user"
-                  ? overlay
-                    ? "text-white/90 text-shadow-sm"
-                    : "bg-white text-black rounded-br-md"
-                  : overlay
-                    ? "text-white/80 text-shadow-sm"
-                    : "bg-neutral-800 text-white rounded-bl-md"
-              }`}
-            >
-              {msg.content}
-            </div>
-          </div>
-        ))}
-        {loading && (
-          <div className="flex justify-start">
-            <div className={`rounded-2xl rounded-bl-md px-4 py-2.5 text-sm ${
-              overlay
-                ? "text-white/60"
-                : "bg-neutral-800 text-white/80"
-            }`}>
-              <span className="inline-flex gap-1">
-                <span className="animate-bounce" style={{ animationDelay: "0ms" }}>.</span>
-                <span className="animate-bounce" style={{ animationDelay: "150ms" }}>.</span>
-                <span className="animate-bounce" style={{ animationDelay: "300ms" }}>.</span>
-              </span>
-            </div>
-          </div>
-        )}
-        {watchingVideo && !loading && (
-          <div className="flex justify-start">
-            <div className={`rounded-2xl rounded-bl-md px-4 py-2.5 text-sm italic ${
-              overlay
-                ? "text-white/50"
-                : "bg-neutral-800 text-white/60"
-            }`}>
-              Watching video
-              <span className="inline-flex gap-0.5 ml-0.5">
-                <span className="animate-bounce" style={{ animationDelay: "0ms" }}>.</span>
-                <span className="animate-bounce" style={{ animationDelay: "150ms" }}>.</span>
-                <span className="animate-bounce" style={{ animationDelay: "300ms" }}>.</span>
-              </span>
-            </div>
-          </div>
+        {showMessages && (
+          <>
+            {messages.map((msg, i) => (
+              <div
+                key={i}
+                className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
+              >
+                <div
+                  className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${
+                    msg.role === "user"
+                      ? overlay
+                        ? "text-white/90 text-shadow-sm"
+                        : "bg-white text-black rounded-br-md"
+                      : overlay
+                        ? "text-white/80 text-shadow-sm"
+                        : "bg-neutral-800 text-white rounded-bl-md"
+                  }`}
+                >
+                  {msg.content}
+                </div>
+              </div>
+            ))}
+            {loading && (
+              <div className="flex justify-start">
+                <div className={`rounded-2xl rounded-bl-md px-4 py-2.5 text-sm ${
+                  overlay
+                    ? "text-white/60"
+                    : "bg-neutral-800 text-white/80"
+                }`}>
+                  <span className="inline-flex gap-1">
+                    <span className="animate-bounce" style={{ animationDelay: "0ms" }}>.</span>
+                    <span className="animate-bounce" style={{ animationDelay: "150ms" }}>.</span>
+                    <span className="animate-bounce" style={{ animationDelay: "300ms" }}>.</span>
+                  </span>
+                </div>
+              </div>
+            )}
+            {watchingVideo && !loading && (
+              <div className="flex justify-start">
+                <div className={`rounded-2xl rounded-bl-md px-4 py-2.5 text-sm italic ${
+                  overlay
+                    ? "text-white/50"
+                    : "bg-neutral-800 text-white/60"
+                }`}>
+                  Watching video
+                  <span className="inline-flex gap-0.5 ml-0.5">
+                    <span className="animate-bounce" style={{ animationDelay: "0ms" }}>.</span>
+                    <span className="animate-bounce" style={{ animationDelay: "150ms" }}>.</span>
+                    <span className="animate-bounce" style={{ animationDelay: "300ms" }}>.</span>
+                  </span>
+                </div>
+              </div>
+            )}
+          </>
         )}
         <div ref={messagesEndRef} />
       </div>
