@@ -452,12 +452,13 @@ export default function Home() {
             onInputChange={setInput}
             onSubmit={sendMessage}
             loading={loading}
-            suggestedReplies={suggestedReplies}
+            suggestedReplies={showMessages ? suggestedReplies : []}
             onQuickReply={handleQuickReply}
             model={model}
             onModelChange={setModel}
             watchingVideo={watchingVideo}
             overlay
+            showMessages={showMessages}
           />
         </div>
       )}
