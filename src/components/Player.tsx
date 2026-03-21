@@ -75,12 +75,14 @@ const Player = forwardRef<PlayerHandle, PlayerProps>(function Player({ videoIds,
   onVideoChangeRef.current = onVideoChange;
 
   const goTo = useCallback((index: number) => {
-    if (index < 0 || index >= videoIdsRef.current.length) return;
-    if (index === currentIndexRef.current) return;
-    playerRef.current?.loadVideoById(videoIdsRef.current[index]);
-    currentIndexRef.current = index;
-    setCurrentIndex(index);
-    onVideoChangeRef.current?.(videoIdsRef.current[index], index);
+    const len = videoIdsRef.current.length;
+    if (len === 0) return;
+    const wrapped = ((index % len) + len) % len;
+    if (wrapped === currentIndexRef.current) return;
+    playerRef.current?.loadVideoById(videoIdsRef.current[wrapped]);
+    currentIndexRef.current = wrapped;
+    setCurrentIndex(wrapped);
+    onVideoChangeRef.current?.(videoIdsRef.current[wrapped], wrapped);
   }, []);
 
   const next = useCallback(() => {
@@ -288,20 +290,12 @@ const Player = forwardRef<PlayerHandle, PlayerProps>(function Player({ videoIds,
         </button>
       )}
 
-      {/* Counter — top right */}
-      {!hideControls && videoIds.length > 1 && (
-        <div className="absolute top-[calc(0.75rem+env(safe-area-inset-top))] right-3 text-white/70 text-xs bg-black/50 backdrop-blur-sm px-2.5 py-1 rounded-full z-30">
-          {currentIndex + 1}/{videoIds.length}
-        </div>
-      )}
-
       {/* Up/Down navigation buttons — right side */}
       {!hideControls && videoIds.length > 1 && (
         <div className="absolute right-3 top-1/2 -translate-y-1/2 z-30 flex flex-col gap-2">
           <button
             onClick={prev}
-            disabled={currentIndex === 0}
-            className="w-10 h-10 flex items-center justify-center rounded-full bg-black/50 backdrop-blur-sm border border-white/15 text-white/85 hover:text-white hover:bg-black/70 disabled:opacity-20 disabled:cursor-default transition-all"
+            className="w-10 h-10 flex items-center justify-center rounded-full bg-black/50 backdrop-blur-sm border border-white/15 text-white/85 hover:text-white hover:bg-black/70 transition-all"
             aria-label="Previous video"
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -310,8 +304,7 @@ const Player = forwardRef<PlayerHandle, PlayerProps>(function Player({ videoIds,
           </button>
           <button
             onClick={next}
-            disabled={currentIndex === videoIds.length - 1}
-            className="w-10 h-10 flex items-center justify-center rounded-full bg-black/50 backdrop-blur-sm border border-white/15 text-white/85 hover:text-white hover:bg-black/70 disabled:opacity-20 disabled:cursor-default transition-all"
+            className="w-10 h-10 flex items-center justify-center rounded-full bg-black/50 backdrop-blur-sm border border-white/15 text-white/85 hover:text-white hover:bg-black/70 transition-all"
             aria-label="Next video"
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
