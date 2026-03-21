@@ -343,33 +343,90 @@ export default function Home() {
   }
 
   // Chat + Video side by side (desktop) / stacked (mobile)
+  // On mobile: splitPercent = video height %, chat gets the rest
+  // On desktop: splitPercent = chat width %, video gets the rest
   return (
-    <main className="h-screen w-screen bg-black flex flex-col md:flex-row">
-      {/* Video — top on mobile, right on desktop */}
-      <div className="w-full md:w-1/2 h-1/2 md:h-full md:order-2">
-        {videoIds.length > 0 ? (
-          <Player videoIds={videoIds} onVideoChange={handleVideoChange} />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center text-neutral-400">
-            Loading video...
-          </div>
-        )}
+    <main ref={containerRef} className="h-screen w-screen bg-black flex flex-col md:flex-row">
+      {/* Chat — top area on mobile (order-2 = bottom), left on desktop */}
+      <div
+        className="w-full md:h-full md:order-1 flex flex-col overflow-hidden"
+        style={{
+          height: `calc(${100 - splitPercent}% - 2px)`,
+          width: undefined,
+        }}
+      >
+        <div className="hidden md:flex w-full h-full flex-col" style={{ width: `${splitPercent}%`, height: '100%' }}>
+          <Chat
+            messages={messages}
+            input={input}
+            onInputChange={setInput}
+            onSubmit={sendMessage}
+            loading={loading}
+            suggestedReplies={suggestedReplies}
+            onQuickReply={handleQuickReply}
+            model={model}
+            onModelChange={setModel}
+            watchingVideo={watchingVideo}
+          />
+        </div>
+        <div className="md:hidden w-full h-full flex flex-col order-2">
+          <Chat
+            messages={messages}
+            input={input}
+            onInputChange={setInput}
+            onSubmit={sendMessage}
+            loading={loading}
+            suggestedReplies={suggestedReplies}
+            onQuickReply={handleQuickReply}
+            model={model}
+            onModelChange={setModel}
+            watchingVideo={watchingVideo}
+          />
+        </div>
       </div>
 
-      {/* Chat — bottom on mobile, left on desktop */}
-      <div className="w-full md:w-1/2 h-1/2 md:h-full md:order-1 border-t md:border-t-0 md:border-r border-neutral-800 flex flex-col">
-        <Chat
-          messages={messages}
-          input={input}
-          onInputChange={setInput}
-          onSubmit={sendMessage}
-          loading={loading}
-          suggestedReplies={suggestedReplies}
-          onQuickReply={handleQuickReply}
-          model={model}
-          onModelChange={setModel}
-          watchingVideo={watchingVideo}
-        />
+      {/* Drag handle */}
+      <div
+        className="md:hidden flex items-center justify-center bg-neutral-900 border-y border-neutral-700 h-1 cursor-row-resize touch-none order-1 shrink-0"
+        onMouseDown={startDrag}
+        onTouchStart={startDrag}
+      >
+        <div className="w-10 h-0.5 rounded-full bg-neutral-500" />
+      </div>
+      <div
+        className="hidden md:flex items-center justify-center bg-neutral-900 border-x border-neutral-700 w-1 cursor-col-resize touch-none order-1 shrink-0"
+        onMouseDown={startDrag}
+        onTouchStart={startDrag}
+      >
+        <div className="h-10 w-0.5 rounded-full bg-neutral-500" />
+      </div>
+
+      {/* Video — top on mobile, right on desktop */}
+      <div
+        className="w-full md:h-full md:order-2 overflow-hidden"
+        style={{
+          height: `calc(${splitPercent}% - 2px)`,
+          width: undefined,
+        }}
+      >
+        <div className="hidden md:block w-full h-full" style={{ width: '100%', height: '100%' }}>
+          {videoIds.length > 0 ? (
+            <Player videoIds={videoIds} onVideoChange={handleVideoChange} />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center text-neutral-400">
+              Loading video...
+            </div>
+          )}
+        </div>
+        <div className="md:hidden w-full h-full">
+          {videoIds.length > 0 ? (
+            <Player videoIds={videoIds} onVideoChange={handleVideoChange} />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center text-neutral-400">
+              Loading video...
+            </div>
+          )}
+        </div>
       </div>
     </main>
   );
