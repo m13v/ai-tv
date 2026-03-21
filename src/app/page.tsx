@@ -429,9 +429,7 @@ export default function Home() {
               ? "opacity-100 translate-y-0 pointer-events-auto"
               : "opacity-0 translate-y-4 pointer-events-none"
             }
-            /* Mobile: bottom sheet */
             bottom-0 left-0 right-0 h-[55%]
-            /* Desktop: right panel */
             md:top-3 md:right-3 md:bottom-3 md:left-auto md:h-auto md:w-[380px] md:translate-y-0
             ${chatVisible ? "" : "md:opacity-0 md:translate-x-4"}
           `}
