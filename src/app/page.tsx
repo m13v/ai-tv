@@ -423,7 +423,7 @@ export default function Home() {
           : "overflow-hidden order-1 min-h-0 min-w-0 split-video-mobile"
       }`}>
         {videoIds.length > 0 ? (
-          <Player videoIds={videoIds} onVideoChange={handleVideoChange} />
+          <Player videoIds={videoIds} onVideoChange={handleVideoChange} hideControls={mobileOverlay && !showControls} />
         ) : (
           <div className="w-full h-full flex items-center justify-center text-neutral-400">
             Loading video...
