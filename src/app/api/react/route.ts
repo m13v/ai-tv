@@ -61,7 +61,9 @@ Rules:
 - Share something interesting you noticed in the video
 - End with something that keeps the conversation going — a fun fact, a follow-up suggestion, or a question
 - Be brief, enthusiastic, and genuine — like a friend watching TV together
-- Do NOT repeat what you already said in the conversation`,
+- Do NOT repeat what you already said in the conversation
+- Suggest 2-3 quick reply options the user might want to say next (short, 2-6 words each) — these become clickable buttons
+- Make suggestions diverse: one could go deeper on the topic, one could pivot, one could be a fun reaction`,
               },
             ],
           },
@@ -89,8 +91,16 @@ Rules:
                   description:
                     "If matchQuality is 'miss', suggest a better YouTube search query (2-5 words). Otherwise leave empty.",
                 },
+                suggestedReplies: {
+                  type: "ARRAY",
+                  description:
+                    "2-3 short quick reply suggestions (2-6 words each) the user might want to say next. Diverse: one deeper, one pivot, one fun reaction.",
+                  items: {
+                    type: "STRING",
+                  },
+                },
               },
-              required: ["reaction", "matchQuality"],
+              required: ["reaction", "matchQuality", "suggestedReplies"],
             },
           },
         }),
@@ -118,6 +128,7 @@ Rules:
       reaction: string;
       matchQuality: string;
       followUpQuery?: string;
+      suggestedReplies?: string[];
     };
     try {
       parsed = JSON.parse(rawText);
