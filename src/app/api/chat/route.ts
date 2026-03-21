@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
 
   try {
     const res = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${apiKey}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro-latest:generateContent?key=${apiKey}`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -48,9 +48,8 @@ Rules:
           contents: geminiContents,
           generationConfig: {
             temperature: 0.7,
-            maxOutputTokens: 256,
+            maxOutputTokens: 1024,
             responseMimeType: "application/json",
-            thinkingConfig: { thinkingBudget: 0 },
             responseSchema: {
               type: "OBJECT",
               properties: {

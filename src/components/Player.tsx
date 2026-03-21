@@ -47,6 +47,7 @@ interface YTPlayer {
 
 export default function Player({ videoIds }: PlayerProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [muted, setMuted] = useState(true);
   const playerRef = useRef<YTPlayer | null>(null);
   const currentIndexRef = useRef(0);
   const videoIdsRef = useRef(videoIds);
@@ -58,21 +59,17 @@ export default function Player({ videoIds }: PlayerProps) {
   const touchDeltaRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
 
   // Wheel debounce
-  const wheelTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const lastWheelNavRef = useRef(0);
 
   videoIdsRef.current = videoIds;
 
-  const goTo = useCallback(
-    (index: number) => {
-      if (index < 0 || index >= videoIdsRef.current.length) return;
-      if (index === currentIndexRef.current) return;
-      playerRef.current?.loadVideoById(videoIdsRef.current[index]);
-      currentIndexRef.current = index;
-      setCurrentIndex(index);
-    },
-    []
-  );
+  const goTo = useCallback((index: number) => {
+    if (index < 0 || index >= videoIdsRef.current.length) return;
+    if (index === currentIndexRef.current) return;
+    playerRef.current?.loadVideoById(videoIdsRef.current[index]);
+    currentIndexRef.current = index;
+    setCurrentIndex(index);
+  }, []);
 
   const next = useCallback(() => {
     goTo(currentIndexRef.current + 1);
@@ -82,20 +79,31 @@ export default function Player({ videoIds }: PlayerProps) {
     goTo(currentIndexRef.current - 1);
   }, [goTo]);
 
-  // Keyboard: arrow keys
+  const toggleMute = useCallback(() => {
+    if (playerRef.current) {
+      if (muted) {
+        playerRef.current.unMute();
+        playerRef.current.setVolume(100);
+      } else {
+        playerRef.current.mute();
+      }
+      setMuted(!muted);
+    }
+  }, [muted]);
+
+  // Keyboard: up/down arrows only (left/right reserved for YouTube seek)
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
-      // Don't capture if user is typing in an input
       if (
         e.target instanceof HTMLInputElement ||
         e.target instanceof HTMLTextAreaElement
       )
         return;
 
-      if (e.key === "ArrowRight" || e.key === "ArrowDown") {
+      if (e.key === "ArrowDown") {
         e.preventDefault();
         next();
-      } else if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
+      } else if (e.key === "ArrowUp") {
         e.preventDefault();
         prev();
       }
@@ -104,7 +112,7 @@ export default function Player({ videoIds }: PlayerProps) {
     return () => window.removeEventListener("keydown", handler);
   }, [next, prev]);
 
-  // Touch: swipe up/down and left/right (mobile)
+  // Touch: swipe up/down (Instagram-style)
   useEffect(() => {
     const el = containerRef.current;
     if (!el) return;
@@ -122,28 +130,14 @@ export default function Player({ videoIds }: PlayerProps) {
         x: touch.clientX - touchStartRef.current.x,
         y: touch.clientY - touchStartRef.current.y,
       };
-      // Prevent page scroll while swiping on the player
       e.preventDefault();
     };
 
     const onTouchEnd = () => {
-      const { x, y } = touchDeltaRef.current;
-      const absX = Math.abs(x);
-      const absY = Math.abs(y);
+      const { y } = touchDeltaRef.current;
       const threshold = 50;
-
-      if (absX > threshold || absY > threshold) {
-        if (absY >= absX) {
-          // Vertical swipe — up = next, down = prev (like Instagram)
-          if (y < -threshold) next();
-          else if (y > threshold) prev();
-        } else {
-          // Horizontal swipe — left = next, right = prev
-          if (x < -threshold) next();
-          else if (x > threshold) prev();
-        }
-      }
-
+      if (y < -threshold) next();
+      else if (y > threshold) prev();
       touchStartRef.current = null;
     };
 
@@ -165,20 +159,12 @@ export default function Player({ videoIds }: PlayerProps) {
 
     const onWheel = (e: WheelEvent) => {
       e.preventDefault();
-
       const now = Date.now();
-      // Debounce: at least 400ms between navigations
       if (now - lastWheelNavRef.current < 400) return;
-
-      // Threshold to avoid accidental triggers
       const threshold = 30;
       if (Math.abs(e.deltaY) > threshold) {
         lastWheelNavRef.current = now;
         if (e.deltaY > 0) next();
-        else prev();
-      } else if (Math.abs(e.deltaX) > threshold) {
-        lastWheelNavRef.current = now;
-        if (e.deltaX > 0) next();
         else prev();
       }
     };
@@ -187,14 +173,13 @@ export default function Player({ videoIds }: PlayerProps) {
     return () => el.removeEventListener("wheel", onWheel);
   }, [next, prev]);
 
-  // YouTube player state change
+  // YouTube player
   const onPlayerStateChange = (event: YTEvent) => {
     if (event.data === window.YT.PlayerState.ENDED) {
       next();
     }
   };
 
-  // Init/update player
   useEffect(() => {
     if (!videoIds.length) return;
 
@@ -216,6 +201,7 @@ export default function Player({ videoIds }: PlayerProps) {
           loop: 0,
           fs: 0,
           iv_load_policy: 3,
+          mute: 1,
         },
         events: {
           onStateChange: onPlayerStateChange,
@@ -223,6 +209,7 @@ export default function Player({ videoIds }: PlayerProps) {
       });
       currentIndexRef.current = 0;
       setCurrentIndex(0);
+      setMuted(true);
     };
 
     if (apiReadyRef.current && window.YT) {
@@ -241,14 +228,7 @@ export default function Player({ videoIds }: PlayerProps) {
         initPlayer();
       };
     }
-
-    return () => {
-      if (wheelTimeoutRef.current) clearTimeout(wheelTimeoutRef.current);
-    };
   }, [videoIds]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  const hasPrev = currentIndex > 0;
-  const hasNext = currentIndex < videoIds.length - 1;
 
   return (
     <div
@@ -259,38 +239,62 @@ export default function Player({ videoIds }: PlayerProps) {
       {/* Video */}
       <div id="yt-player" className="w-full h-full" />
 
-      {/* Click zones — left/right halves */}
-      {hasPrev && (
+      {/* Big unmute button — center */}
+      {muted && (
         <button
-          onClick={prev}
-          className="absolute left-0 top-0 w-16 h-full z-10 cursor-pointer group"
-          aria-label="Previous video"
+          onClick={toggleMute}
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 w-20 h-20 flex items-center justify-center rounded-full bg-black/60 backdrop-blur-sm border border-white/20 hover:bg-black/80 hover:scale-105 transition-all cursor-pointer"
+          aria-label="Unmute"
         >
-          <div className="absolute left-3 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center rounded-full bg-black/0 group-hover:bg-black/40 transition-all text-white/0 group-hover:text-white/80 text-lg">
-            &#9664;
-          </div>
-        </button>
-      )}
-      {hasNext && (
-        <button
-          onClick={next}
-          className="absolute right-0 top-0 w-16 h-full z-10 cursor-pointer group"
-          aria-label="Next video"
-        >
-          <div className="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center rounded-full bg-black/0 group-hover:bg-black/40 transition-all text-white/0 group-hover:text-white/80 text-lg">
-            &#9654;
-          </div>
+          <svg
+            width="32"
+            height="32"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="white"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+            <line x1="23" y1="9" x2="17" y2="15" />
+            <line x1="17" y1="9" x2="23" y2="15" />
+          </svg>
         </button>
       )}
 
-      {/* Counter */}
+      {/* Small mute button — top left (shown when unmuted) */}
+      {!muted && (
+        <button
+          onClick={toggleMute}
+          className="absolute top-3 left-3 z-20 w-9 h-9 flex items-center justify-center rounded-full bg-black/50 backdrop-blur-sm text-white/70 hover:text-white hover:bg-black/70 transition-all"
+          aria-label="Mute"
+        >
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+            <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
+            <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
+          </svg>
+        </button>
+      )}
+
+      {/* Counter — top right */}
       {videoIds.length > 1 && (
         <div className="absolute top-3 right-3 text-white/40 text-xs bg-black/50 backdrop-blur-sm px-2.5 py-1 rounded-full z-10">
           {currentIndex + 1}/{videoIds.length}
         </div>
       )}
 
-      {/* Navigation hint — bottom center, fades out */}
+      {/* Navigation hint */}
       <NavigationHint />
     </div>
   );
@@ -300,19 +304,16 @@ function NavigationHint() {
   const [visible, setVisible] = useState(true);
 
   useEffect(() => {
-    const timer = setTimeout(() => setVisible(false), 4000);
+    const timer = setTimeout(() => setVisible(false), 5000);
     return () => clearTimeout(timer);
   }, []);
 
   if (!visible) return null;
 
   return (
-    <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 text-white/30 text-xs bg-black/40 backdrop-blur-sm px-3 py-1.5 rounded-full flex items-center gap-3 transition-opacity duration-1000 animate-fade-out">
-      <span>&#8592; &#8594; arrows</span>
-      <span className="text-white/15">|</span>
-      <span>scroll</span>
-      <span className="text-white/15">|</span>
-      <span>swipe</span>
+    <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 text-white/40 text-xs bg-black/50 backdrop-blur-sm px-4 py-2 rounded-full flex items-center gap-2 animate-fade-out">
+      <span>&#8593; &#8595;</span>
+      <span>next / prev video</span>
     </div>
   );
 }
