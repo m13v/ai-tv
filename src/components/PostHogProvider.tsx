@@ -16,6 +16,17 @@ export default function PostHogProvider({
       capture_pageview: true,
       capture_pageleave: true,
       autocapture: true,
+      session_recording: {
+        maskAllInputs: false,
+        maskInputFn: (text, element) => {
+          // Don't mask the search/chat input — we want to see queries
+          if (element?.getAttribute("placeholder")?.includes("watch") ||
+              element?.getAttribute("placeholder")?.includes("Ask")) {
+            return text;
+          }
+          return text;
+        },
+      },
     });
   }, []);
 
