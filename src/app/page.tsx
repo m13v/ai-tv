@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useRef, useEffect, useMemo } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import posthog from "posthog-js";
 import Player, { type PlayerHandle } from "@/components/Player";
 import Chat from "@/components/Chat";
@@ -217,6 +217,28 @@ export default function Home() {
       setWatchingVideo(false);
     }
   }, [messages, watchingVideo]);
+
+  const fetchMoreVideos = useCallback(async () => {
+    const query = lastSearchQueryRef.current;
+    if (!query) return;
+    try {
+      const res = await fetch("/api/search", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ query }),
+      });
+      const { videoIds: newIds } = await res.json();
+      if (newIds?.length > 0) {
+        const fresh = newIds.filter((id: string) => !videoIdSetRef.current.has(id));
+        if (fresh.length > 0) {
+          fresh.forEach((id: string) => videoIdSetRef.current.add(id));
+          setVideoIds((prev) => [...prev, ...fresh]);
+        }
+      }
+    } catch {
+      console.error("Failed to fetch more videos");
+    }
+  }, []);
 
   const handleQuickReply = useCallback(
     (reply: string) => {
@@ -493,7 +515,7 @@ export default function Home() {
           : "overflow-hidden order-1 min-h-0 min-w-0 split-video-mobile"
       }`}>
         {videoIds.length > 0 ? (
-          <Player ref={playerRef} videoIds={videoIds} onVideoChange={handleVideoChange} hideControls={mobileOverlay && !showControls} onMuteChange={setMuted} />
+          <Player ref={playerRef} videoIds={videoIds} onVideoChange={handleVideoChange} onNearEnd={fetchMoreVideos} hideControls={mobileOverlay && !showControls} onMuteChange={setMuted} />
         ) : (
           <div className="w-full h-full flex items-center justify-center text-neutral-400">
             Loading video...
