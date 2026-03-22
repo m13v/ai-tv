@@ -368,7 +368,7 @@ export default function Home() {
                 disabled={!input.trim()}
                 className="bg-white text-black font-semibold px-6 py-4 rounded-full hover:bg-neutral-200 disabled:opacity-40 disabled:cursor-not-allowed transition-colors text-lg"
               >
-                Watch
+                Go
               </button>
             </div>
           </form>
