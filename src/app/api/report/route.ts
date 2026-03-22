@@ -19,7 +19,7 @@ export async function POST(req: NextRequest) {
 
   const { error } = await resend.emails.send({
     from: "AI TV Reports <matt@vidq.tv>",
-    to: "matt@vidq.tv",
+    to: "i@m13v.com",
     replyTo: userEmail || undefined,
     subject: `AI TV Report${videoId ? ` — video: ${videoId}` : ""}`,
     text: [
