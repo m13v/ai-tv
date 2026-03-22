@@ -74,9 +74,9 @@ export default function Chat({
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, watchingVideo]);
 
-  // Refocus input after response completes (not in overlay mode — avoids keyboard popping up on mobile)
+  // Refocus input after response completes (desktop only — avoids keyboard popping up on mobile)
   useEffect(() => {
-    if (!loading && !overlay) {
+    if (!loading && !overlay && window.matchMedia("(min-width: 768px)").matches) {
       inputRef.current?.focus();
     }
   }, [loading, overlay]);
@@ -93,6 +93,13 @@ export default function Chat({
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
   }, []);
+
+  // Auto-focus input on mount — desktop only to avoid mobile keyboard
+  useEffect(() => {
+    if (!overlay && window.matchMedia("(min-width: 768px)").matches) {
+      inputRef.current?.focus();
+    }
+  }, [overlay]);
 
   return (
     <div className={`flex flex-col h-full ${overlay ? "pointer-events-none" : ""}`}>
@@ -217,7 +224,7 @@ export default function Chat({
                     : "bg-neutral-900 border border-neutral-700 focus:border-neutral-600"
                 }`}
                 disabled={loading}
-                autoFocus={!overlay}
+                autoFocus={false}
               />
               <div className="absolute right-3 top-1/2 -translate-y-1/2 items-center gap-0.5 pointer-events-none hidden md:flex">
                 <kbd className="text-[10px] text-white/50 bg-white/8 border border-white/10 rounded px-1 py-0.5 font-mono">
