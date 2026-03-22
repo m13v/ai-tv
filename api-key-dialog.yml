@@ -1,0 +1,174 @@
+- generic:
+  - generic:
+    - navigation:
+      - complementary:
+        - generic:
+          - button:
+            - generic:
+              - generic:
+                - generic:
+                  - generic:
+                    - img
+                    - text: m
+                - generic:
+                  - generic: m13v
+            - generic:
+              - img
+        - navigation:
+          - list:
+            - listitem:
+              - link:
+                - /url: /emails
+                - generic:
+                  - img
+                - text: Emails
+            - listitem:
+              - link:
+                - /url: /broadcasts
+                - generic:
+                  - img
+                - text: Broadcasts
+            - listitem:
+              - link:
+                - /url: /templates
+                - generic:
+                  - img
+                - text: Templates
+            - listitem:
+              - link:
+                - /url: /audience
+                - generic:
+                  - img
+                - text: Audience
+            - listitem:
+              - link:
+                - /url: /metrics
+                - generic:
+                  - img
+                - text: Metrics
+            - listitem:
+              - link:
+                - /url: /domains
+                - generic:
+                  - img
+                - text: Domains
+            - listitem:
+              - link:
+                - /url: /logs
+                - generic:
+                  - img
+                - text: Logs
+            - listitem:
+              - link:
+                - /url: /api-keys
+                - generic:
+                  - img
+                - text: API Keys
+            - listitem:
+              - link:
+                - /url: /webhooks
+                - generic:
+                  - img
+                - text: Webhooks
+            - listitem:
+              - link:
+                - /url: /settings
+                - generic:
+                  - img
+                - text: Settings
+        - button:
+          - generic:
+            - generic:
+              - generic:
+                - generic: i
+              - generic: i@m13v.com
+          - generic:
+            - img
+    - generic:
+      - generic:
+        - generic:
+          - button:
+            - generic:
+              - generic:
+                - img
+            - generic: Feedback
+            - generic:
+              - generic: F
+          - link:
+            - /url: /help
+            - text: Help
+          - link:
+            - /url: https://resend.com/docs/dashboard/api-keys/introduction
+            - text: Docs
+      - generic:
+        - generic:
+          - heading [level=1]: API Keys
+          - generic:
+            - button [expanded]:
+              - generic:
+                - img
+              - generic: Create API Key
+            - button:
+              - generic:
+                - img
+        - generic:
+          - generic:
+            - generic:
+              - generic:
+                - generic:
+                  - generic:
+                    - generic:
+                      - img
+                - textbox:
+                  - /placeholder: Search...
+              - combobox:
+                - generic: All Permissions
+                - img
+            - button:
+              - generic:
+                - generic:
+                  - img
+          - generic:
+            - generic:
+              - heading [level=2]: No API keys yet
+              - generic: Generate an API key to authenticate requests and send emails through the API.
+              - generic:
+                - button:
+                  - generic:
+                    - img
+                  - generic: Create API Key
+  - region "Notifications alt+T"
+  - alert
+  - dialog "Add API Key" [ref=e234]:
+    - heading "Add API Key" [level=2] [ref=e235]
+    - generic [ref=e236]:
+      - generic [ref=e237]:
+        - generic [ref=e238]: Name
+        - textbox "Name" [active] [ref=e239]:
+          - /placeholder: Your API Key name
+          - text: ai-tv
+      - generic [ref=e240]:
+        - generic [ref=e241]:
+          - generic [ref=e242]: Permission
+          - img [ref=e243]
+        - combobox [ref=e246] [cursor=pointer]:
+          - generic: Full access
+          - img [ref=e247]
+        - combobox [ref=e249]
+      - generic [ref=e250]:
+        - generic [ref=e251]: Domain
+        - combobox [disabled] [ref=e252]:
+          - generic [ref=e253]:
+            - generic [ref=e254]: All Domains
+            - img [ref=e255]
+      - generic [ref=e257]:
+        - button "Add ⌘ ↩" [ref=e258] [cursor=pointer]:
+          - generic [ref=e259]: Add
+          - generic [ref=e260]:
+            - generic [ref=e261]: ⌘
+            - generic [ref=e262]: ↩
+        - button "Cancel Esc" [ref=e263] [cursor=pointer]:
+          - generic [ref=e264]: Cancel
+          - generic [ref=e266]: Esc
+    - button "Close dialog" [ref=e267] [cursor=pointer]:
+      - img [ref=e268]
