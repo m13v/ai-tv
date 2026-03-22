@@ -176,7 +176,7 @@ export default function Chat({
                 value={input}
                 onChange={(e) => onInputChange(e.target.value)}
                 placeholder="Ask something or describe what to watch next..."
-                className={`w-full rounded-full px-4 py-2.5 pr-16 text-white placeholder-neutral-400 focus:outline-none text-sm text-[16px] md:text-sm ${
+                className={`w-full rounded-full px-4 py-2.5 md:pr-16 text-white placeholder-neutral-400 focus:outline-none text-sm text-[16px] md:text-sm ${
                   overlay
                     ? "bg-black/50 backdrop-blur-md border border-white/20 focus:border-white/40"
                     : "bg-neutral-900 border border-neutral-700 focus:border-neutral-600"
