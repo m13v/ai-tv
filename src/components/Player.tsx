@@ -1,6 +1,7 @@
 "use client";
 
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from "react";
+import posthog from "posthog-js";
 
 interface PlayerProps {
   videoIds: string[];
@@ -88,7 +89,7 @@ const Player = forwardRef<PlayerHandle, PlayerProps>(function Player({ videoIds,
   onNearEndRef.current = onNearEnd;
   const fetchingMoreRef = useRef(false);
 
-  const navigateTo = useCallback((index: number) => {
+  const navigateTo = useCallback((index: number, source?: string) => {
     const len = videoIdsRef.current.length;
     if (len === 0 || index < 0 || index >= len) return;
     if (index === currentIndexRef.current) return;
@@ -96,6 +97,14 @@ const Player = forwardRef<PlayerHandle, PlayerProps>(function Player({ videoIds,
     currentIndexRef.current = index;
     setCurrentIndex(index);
     onVideoChangeRef.current?.(videoIdsRef.current[index], index);
+
+    posthog.capture("video_navigate", {
+      video_id: videoIdsRef.current[index],
+      video_index: index,
+      total_videos: len,
+      source: source || "unknown",
+      direction: index > currentIndexRef.current ? "next" : "prev",
+    });
 
     // Fetch more when within 3 of the end
     if (index >= len - 3 && !fetchingMoreRef.current) {
@@ -105,18 +114,18 @@ const Player = forwardRef<PlayerHandle, PlayerProps>(function Player({ videoIds,
     }
   }, []);
 
-  const next = useCallback(() => {
+  const next = useCallback((source?: string) => {
     const nextIndex = currentIndexRef.current + 1;
     if (nextIndex >= videoIdsRef.current.length) return;
     historyRef.current.push(nextIndex);
-    navigateTo(nextIndex);
+    navigateTo(nextIndex, source || "button");
   }, [navigateTo]);
 
-  const prev = useCallback(() => {
+  const prev = useCallback((source?: string) => {
     if (historyRef.current.length <= 1) return; // at first video, nothing to go back to
     historyRef.current.pop(); // remove current
     const prevIndex = historyRef.current[historyRef.current.length - 1];
-    navigateTo(prevIndex);
+    navigateTo(prevIndex, source || "button");
   }, [navigateTo]);
 
   const toggleMute = useCallback(() => {
@@ -131,6 +140,10 @@ const Player = forwardRef<PlayerHandle, PlayerProps>(function Player({ videoIds,
       setMuted(newMuted);
       mutedRef.current = newMuted;
       onMuteChange?.(newMuted);
+      posthog.capture("video_mute_toggle", {
+        muted: newMuted,
+        video_id: videoIdsRef.current[currentIndexRef.current],
+      });
     }
   }, [muted, onMuteChange]);
 
@@ -141,6 +154,10 @@ const Player = forwardRef<PlayerHandle, PlayerProps>(function Player({ videoIds,
       } else {
         playerRef.current.playVideo();
       }
+      posthog.capture("video_play_pause", {
+        action: playing ? "pause" : "play",
+        video_id: videoIdsRef.current[currentIndexRef.current],
+      });
     }
   }, [playing]);
 
@@ -162,10 +179,10 @@ const Player = forwardRef<PlayerHandle, PlayerProps>(function Player({ videoIds,
 
       if (e.key === "ArrowDown") {
         e.preventDefault();
-        next();
+        next("keyboard");
       } else if (e.key === "ArrowUp") {
         e.preventDefault();
-        prev();
+        prev("keyboard");
       }
     };
     window.addEventListener("keydown", handler);
@@ -196,8 +213,8 @@ const Player = forwardRef<PlayerHandle, PlayerProps>(function Player({ videoIds,
     const onTouchEnd = () => {
       const { y } = touchDeltaRef.current;
       const threshold = 50;
-      if (y < -threshold) next();
-      else if (y > threshold) prev();
+      if (y < -threshold) next("swipe");
+      else if (y > threshold) prev("swipe");
       touchStartRef.current = null;
     };
 
@@ -224,8 +241,8 @@ const Player = forwardRef<PlayerHandle, PlayerProps>(function Player({ videoIds,
       const threshold = 30;
       if (Math.abs(e.deltaY) > threshold) {
         lastWheelNavRef.current = now;
-        if (e.deltaY > 0) next();
-        else prev();
+        if (e.deltaY > 0) next("wheel");
+        else prev("wheel");
       }
     };
 
@@ -236,7 +253,11 @@ const Player = forwardRef<PlayerHandle, PlayerProps>(function Player({ videoIds,
   // YouTube player
   const onPlayerStateChange = (event: YTEvent) => {
     if (event.data === window.YT.PlayerState.ENDED) {
-      next();
+      posthog.capture("video_ended", {
+        video_id: videoIdsRef.current[currentIndexRef.current],
+        video_index: currentIndexRef.current,
+      });
+      next("auto_advance");
     }
     const isPlaying = event.data === window.YT.PlayerState.PLAYING;
     const isPaused = event.data === window.YT.PlayerState.PAUSED || event.data === window.YT.PlayerState.ENDED;
