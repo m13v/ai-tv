@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useCallback } from "react";
+import { useVoiceInput } from "@/hooks/useVoiceInput";
 
 interface Message {
   role: "user" | "assistant";
@@ -40,6 +41,19 @@ export default function Chat({
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const touchStartRef = useRef<{ x: number; y: number; time: number } | null>(null);
+
+  // Voice input — push-to-talk
+  const handleVoiceTranscript = useCallback(
+    (transcript: string) => {
+      onInputChange(input ? `${input} ${transcript}` : transcript);
+      // Only focus input on desktop — avoid keyboard popup on mobile
+      if (window.matchMedia("(min-width: 768px)").matches) {
+        inputRef.current?.focus();
+      }
+    },
+    [input, onInputChange]
+  );
+  const { recording, transcribing, toggleRecording } = useVoiceInput(handleVoiceTranscript);
 
   // In overlay mode: allow scrolling via swipe, pass taps through to iframe
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
