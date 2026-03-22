@@ -39,5 +39,15 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "failed to send report" }, { status: 500 });
   }
 
+  // Send confirmation copy to user if they provided email
+  if (userEmail?.trim()) {
+    await resend.emails.send({
+      from: "AI TV <matt@vidq.tv>",
+      to: userEmail.trim(),
+      subject: "We received your feedback — AI TV",
+      text: `Thanks for your feedback! We've received your report and will look into it.\n\nYour message:\n"${feedback}"\n\n— AI TV team`,
+    }).catch(() => {}); // Don't fail the request if confirmation fails
+  }
+
   return NextResponse.json({ success: true });
 }
