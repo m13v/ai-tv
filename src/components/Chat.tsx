@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useCallback } from "react";
 
 interface Message {
   role: "user" | "assistant";
@@ -37,7 +37,37 @@ export default function Chat({
   overlay,
 }: ChatProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const touchStartRef = useRef<{ x: number; y: number; time: number } | null>(null);
+
+  // In overlay mode: allow scrolling via swipe, pass taps through to iframe
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    const touch = e.touches[0];
+    touchStartRef.current = { x: touch.clientX, y: touch.clientY, time: Date.now() };
+  }, []);
+
+  const handleTouchEnd = useCallback((e: React.TouchEvent) => {
+    if (!touchStartRef.current) return;
+    const touch = e.changedTouches[0];
+    const dx = Math.abs(touch.clientX - touchStartRef.current.x);
+    const dy = Math.abs(touch.clientY - touchStartRef.current.y);
+    const dt = Date.now() - touchStartRef.current.time;
+    touchStartRef.current = null;
+
+    // If it was a tap (minimal movement, short duration), pass through to element below
+    if (dx < 10 && dy < 10 && dt < 300) {
+      const el = messagesContainerRef.current;
+      if (el) {
+        el.style.pointerEvents = "none";
+        const below = document.elementFromPoint(touch.clientX, touch.clientY);
+        el.style.pointerEvents = "";
+        if (below && below !== el) {
+          (below as HTMLElement).click();
+        }
+      }
+    }
+  }, []);
 
   // Auto-scroll to bottom on new messages or watching state
   useEffect(() => {
@@ -67,7 +97,12 @@ export default function Chat({
   return (
     <div className={`flex flex-col h-full ${overlay ? "pointer-events-none" : ""}`}>
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4">
+      <div
+        ref={messagesContainerRef}
+        className={`flex-1 overflow-y-auto px-4 py-4 space-y-4 ${overlay ? "pointer-events-auto touch-action-pan-y" : ""}`}
+        onTouchStart={overlay ? handleTouchStart : undefined}
+        onTouchEnd={overlay ? handleTouchEnd : undefined}
+      >
         {messages.map((msg, i) => (
           <div
             key={i}
