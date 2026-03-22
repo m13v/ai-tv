@@ -26,6 +26,10 @@ export default function Home() {
   const [muted, setMuted] = useState(true);
   const [playing, setPlaying] = useState(false);
   const playerRef = useRef<PlayerHandle | null>(null);
+  const [showReport, setShowReport] = useState(false);
+  const [reportFeedback, setReportFeedback] = useState("");
+  const [reportEmail, setReportEmail] = useState("");
+  const [reportStatus, setReportStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
 
   // Load mobile layout preference
   useEffect(() => {
@@ -324,6 +328,38 @@ export default function Home() {
     });
   }, []);
 
+  const submitReport = useCallback(async () => {
+    if (!reportFeedback.trim() || reportStatus === "sending") return;
+    setReportStatus("sending");
+    posthog.capture("report_submitted", {
+      video_id: videoIds[0],
+      message_count: messages.length,
+    });
+    try {
+      const res = await fetch("/api/report", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          feedback: reportFeedback.trim(),
+          userEmail: reportEmail.trim() || undefined,
+          videoId: videoIds[0],
+          messageCount: messages.length,
+          userAgent: navigator.userAgent,
+        }),
+      });
+      if (!res.ok) throw new Error();
+      setReportStatus("sent");
+      setTimeout(() => {
+        setShowReport(false);
+        setReportFeedback("");
+        setReportEmail("");
+        setReportStatus("idle");
+      }, 1500);
+    } catch {
+      setReportStatus("error");
+    }
+  }, [reportFeedback, reportEmail, reportStatus, videoIds, messages.length]);
+
   // Landing page
   if (!hasStarted) {
     return (
@@ -453,6 +489,21 @@ export default function Home() {
                   <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94" />
                   <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19" />
                   <line x1="1" y1="1" x2="23" y2="23" />
+                </svg>
+              </button>
+              <button
+                onClick={() => {
+                  setShowReport(true);
+                  posthog.capture("report_opened", { video_id: videoIds[0] });
+                }}
+                className="w-9 h-9 flex items-center justify-center rounded-full bg-black/40 backdrop-blur-sm text-white/60 hover:text-white hover:bg-black/60 transition-all cursor-pointer"
+                aria-label="Report"
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="none">
+                  <path d="M12 2L1 21h22L12 2z" opacity="0.5" />
+                  <path d="M12 2L1 21h22L12 2z" fill="none" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
+                  <line x1="12" y1="9" x2="12" y2="15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                  <circle cx="12" cy="18" r="1" fill="currentColor" />
                 </svg>
               </button>
             </div>
