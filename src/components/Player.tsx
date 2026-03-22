@@ -8,10 +8,14 @@ interface PlayerProps {
   onNearEnd?: () => void;
   hideControls?: boolean;
   onMuteChange?: (muted: boolean) => void;
+  onPlayChange?: (playing: boolean) => void;
 }
 
 export interface PlayerHandle {
   toggleMute: () => void;
+  togglePlay: () => void;
+  next: () => void;
+  prev: () => void;
 }
 
 declare global {
@@ -53,10 +57,13 @@ interface YTPlayer {
   destroy: () => void;
 }
 
-const Player = forwardRef<PlayerHandle, PlayerProps>(function Player({ videoIds, onVideoChange, onNearEnd, hideControls, onMuteChange }, ref) {
+const Player = forwardRef<PlayerHandle, PlayerProps>(function Player({ videoIds, onVideoChange, onNearEnd, hideControls, onMuteChange, onPlayChange }, ref) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [muted, setMuted] = useState(true);
+  const [playing, setPlaying] = useState(false);
   const mutedRef = useRef(true);
+  const onPlayChangeRef = useRef(onPlayChange);
+  onPlayChangeRef.current = onPlayChange;
   const playerRef = useRef<YTPlayer | null>(null);
   const currentIndexRef = useRef(0);
   const videoIdsRef = useRef(videoIds);
@@ -127,9 +134,22 @@ const Player = forwardRef<PlayerHandle, PlayerProps>(function Player({ videoIds,
     }
   }, [muted, onMuteChange]);
 
+  const togglePlay = useCallback(() => {
+    if (playerRef.current) {
+      if (playing) {
+        playerRef.current.pauseVideo();
+      } else {
+        playerRef.current.playVideo();
+      }
+    }
+  }, [playing]);
+
   useImperativeHandle(ref, () => ({
     toggleMute,
-  }), [toggleMute]);
+    togglePlay,
+    next,
+    prev,
+  }), [toggleMute, togglePlay, next, prev]);
 
   // Keyboard: up/down arrows only (left/right reserved for YouTube seek)
   useEffect(() => {
