@@ -752,6 +752,44 @@ export default function Home() {
           watchingVideo={watchingVideo}
         />
       </div>
+
+      {/* Report modal */}
+      {showReport && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4" onClick={() => { setShowReport(false); setReportStatus("idle"); }}>
+          <div className="bg-neutral-900 border border-neutral-700 rounded-2xl w-full max-w-sm p-5 flex flex-col gap-4" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between">
+              <h2 className="text-white font-semibold text-lg">Report / Feedback</h2>
+              <button onClick={() => { setShowReport(false); setReportStatus("idle"); }} className="text-white/40 hover:text-white transition-colors cursor-pointer">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+              </button>
+            </div>
+            <textarea
+              value={reportFeedback}
+              onChange={(e) => setReportFeedback(e.target.value)}
+              placeholder="What's wrong? Or any feedback..."
+              className="w-full bg-neutral-800 border border-neutral-600 rounded-xl px-4 py-3 text-white placeholder-neutral-500 focus:outline-none focus:border-neutral-400 resize-none text-sm"
+              rows={3}
+              autoFocus
+            />
+            <input
+              type="email"
+              value={reportEmail}
+              onChange={(e) => setReportEmail(e.target.value)}
+              placeholder="Your email (optional)"
+              className="w-full bg-neutral-800 border border-neutral-600 rounded-xl px-4 py-3 text-white placeholder-neutral-500 focus:outline-none focus:border-neutral-400 text-sm"
+            />
+            <button
+              onClick={submitReport}
+              disabled={!reportFeedback.trim() || reportStatus === "sending" || reportStatus === "sent"}
+              className="w-full bg-white text-black font-semibold py-3 rounded-xl hover:bg-neutral-200 disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer text-sm"
+            >
+              {reportStatus === "sending" ? "Sending..." : reportStatus === "sent" ? "Sent!" : reportStatus === "error" ? "Failed — try again" : "Send Report"}
+            </button>
+          </div>
+        </div>
+      )}
     </main>
   );
 }
