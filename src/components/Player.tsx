@@ -238,6 +238,12 @@ const Player = forwardRef<PlayerHandle, PlayerProps>(function Player({ videoIds,
     if (event.data === window.YT.PlayerState.ENDED) {
       next();
     }
+    const isPlaying = event.data === window.YT.PlayerState.PLAYING;
+    const isPaused = event.data === window.YT.PlayerState.PAUSED || event.data === window.YT.PlayerState.ENDED;
+    if (isPlaying || isPaused) {
+      setPlaying(isPlaying);
+      onPlayChangeRef.current?.(isPlaying);
+    }
   };
 
   useEffect(() => {
