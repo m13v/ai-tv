@@ -93,6 +93,7 @@ const Player = forwardRef<PlayerHandle, PlayerProps>(function Player({ videoIds,
     const len = videoIdsRef.current.length;
     if (len === 0 || index < 0 || index >= len) return;
     if (index === currentIndexRef.current) return;
+    const prevIndex = currentIndexRef.current;
     playerRef.current?.loadVideoById(videoIdsRef.current[index]);
     currentIndexRef.current = index;
     setCurrentIndex(index);
@@ -103,7 +104,7 @@ const Player = forwardRef<PlayerHandle, PlayerProps>(function Player({ videoIds,
       video_index: index,
       total_videos: len,
       source: source || "unknown",
-      direction: index > currentIndexRef.current ? "next" : "prev",
+      direction: index > prevIndex ? "next" : "prev",
     });
 
     // Fetch more when within 3 of the end
@@ -361,7 +362,7 @@ const Player = forwardRef<PlayerHandle, PlayerProps>(function Player({ videoIds,
       {!hideControls && videoIds.length > 1 && (
         <div className="absolute right-3 top-1/2 -translate-y-1/2 z-30 flex flex-col gap-2">
           <button
-            onClick={prev}
+            onClick={() => prev("button")}
             className="w-10 h-10 flex items-center justify-center rounded-full bg-black/50 backdrop-blur-sm border border-white/15 text-white/85 hover:text-white hover:bg-black/70 transition-all"
             aria-label="Previous video"
           >
@@ -370,7 +371,7 @@ const Player = forwardRef<PlayerHandle, PlayerProps>(function Player({ videoIds,
             </svg>
           </button>
           <button
-            onClick={next}
+            onClick={() => next("button")}
             className="w-10 h-10 flex items-center justify-center rounded-full bg-black/50 backdrop-blur-sm border border-white/15 text-white/85 hover:text-white hover:bg-black/70 transition-all"
             aria-label="Next video"
           >
