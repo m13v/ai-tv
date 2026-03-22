@@ -39,7 +39,7 @@ export default function Chat({
 }: ChatProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
   const touchStartRef = useRef<{ x: number; y: number; time: number } | null>(null);
 
   // Voice input — push-to-talk
@@ -94,6 +94,14 @@ export default function Chat({
       inputRef.current?.focus();
     }
   }, [loading, overlay]);
+
+  // Auto-resize textarea to fit content (up to max-height)
+  useEffect(() => {
+    const el = inputRef.current;
+    if (!el) return;
+    el.style.height = "auto";
+    el.style.height = `${el.scrollHeight}px`;
+  }, [input]);
 
   // Expose input ref for Cmd+K
   useEffect(() => {
@@ -226,21 +234,28 @@ export default function Chat({
             className="flex gap-2"
           >
             <div className="relative flex-1">
-              <input
+              <textarea
                 ref={inputRef}
-                type="text"
                 value={input}
                 onChange={(e) => onInputChange(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && !e.shiftKey) {
+                    e.preventDefault();
+                    onSubmit();
+                  }
+                }}
                 placeholder="Ask something or describe what to watch next..."
-                className={`w-full rounded-full px-4 py-2.5 md:pr-16 text-white placeholder-neutral-400 focus:outline-none text-sm text-[16px] md:text-sm ${
+                rows={1}
+                className={`w-full rounded-2xl px-4 py-2.5 md:pr-16 text-white placeholder-neutral-400 focus:outline-none text-xs resize-none leading-relaxed ${
                   overlay
                     ? "bg-black/50 backdrop-blur-md border border-white/20 focus:border-white/40"
                     : "bg-neutral-900 border border-neutral-700 focus:border-neutral-600"
                 }`}
+                style={{ maxHeight: "calc(15 * 1.625em)" }}
                 disabled={loading}
                 autoFocus={false}
               />
-              <div className="absolute right-3 top-1/2 -translate-y-1/2 items-center gap-0.5 pointer-events-none hidden md:flex">
+              <div className="absolute right-3 top-2.5 items-center gap-0.5 pointer-events-none hidden md:flex">
                 <kbd className="text-[10px] text-white/50 bg-white/8 border border-white/10 rounded px-1 py-0.5 font-mono">
                   &#8984;
                 </kbd>
