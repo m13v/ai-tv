@@ -37,6 +37,15 @@ export default function Home() {
     if (saved !== null) setMobileOverlay(saved === "true");
   }, []);
 
+  // Auto-start with default query
+  const autoStarted = useRef(false);
+  useEffect(() => {
+    if (!autoStarted.current) {
+      autoStarted.current = true;
+      sendMessage("time lapse videos of people working");
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
   const sendMessage = useCallback(async (overrideInput?: string) => {
     const raw = overrideInput ?? input;
     if (!raw.trim() || loading) return;
