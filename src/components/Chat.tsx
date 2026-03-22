@@ -250,6 +250,35 @@ export default function Chat({
               </div>
             </div>
             <button
+              type="button"
+              onClick={toggleRecording}
+              disabled={loading || transcribing}
+              className={`flex items-center justify-center w-10 h-10 rounded-full transition-colors shrink-0 ${
+                recording
+                  ? "bg-red-500 text-white animate-pulse"
+                  : transcribing
+                    ? "bg-neutral-700 text-white/50 cursor-wait"
+                    : overlay
+                      ? "bg-black/50 backdrop-blur-md border border-white/20 text-white hover:bg-black/70"
+                      : "bg-neutral-800 text-white hover:bg-neutral-700 border border-neutral-700"
+              }`}
+              aria-label={recording ? "Stop recording" : "Start voice input"}
+            >
+              {transcribing ? (
+                <svg className="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none">
+                  <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeDasharray="31.4 31.4" />
+                </svg>
+              ) : (
+                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+                  {recording ? (
+                    <rect x="6" y="6" width="12" height="12" rx="2" />
+                  ) : (
+                    <path d="M12 1a4 4 0 0 0-4 4v7a4 4 0 0 0 8 0V5a4 4 0 0 0-4-4zm-1 18.93A7.01 7.01 0 0 1 5 13h2a5 5 0 0 0 10 0h2a7.01 7.01 0 0 1-6 6.93V22h3v2H8v-2h3v-2.07z" />
+                  )}
+                </svg>
+              )}
+            </button>
+            <button
               type="submit"
               disabled={loading || !input.trim()}
               className="bg-white text-black font-medium px-4 py-2.5 rounded-full hover:bg-neutral-200 disabled:opacity-30 disabled:cursor-not-allowed transition-colors text-sm"
