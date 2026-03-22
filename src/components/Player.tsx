@@ -63,6 +63,9 @@ const Player = forwardRef<PlayerHandle, PlayerProps>(function Player({ videoIds,
   const apiReadyRef = useRef(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
+  // History stack for "previous" navigation
+  const historyRef = useRef<number[]>([0]);
+
   // Touch/swipe tracking
   const touchStartRef = useRef<{ x: number; y: number } | null>(null);
   const touchDeltaRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
@@ -78,7 +81,7 @@ const Player = forwardRef<PlayerHandle, PlayerProps>(function Player({ videoIds,
   onNearEndRef.current = onNearEnd;
   const fetchingMoreRef = useRef(false);
 
-  const goTo = useCallback((index: number) => {
+  const navigateTo = useCallback((index: number) => {
     const len = videoIdsRef.current.length;
     if (len === 0 || index < 0 || index >= len) return;
     if (index === currentIndexRef.current) return;
@@ -91,18 +94,23 @@ const Player = forwardRef<PlayerHandle, PlayerProps>(function Player({ videoIds,
     if (index >= len - 3 && !fetchingMoreRef.current) {
       fetchingMoreRef.current = true;
       onNearEndRef.current?.();
-      // Reset after a delay to allow re-triggering
       setTimeout(() => { fetchingMoreRef.current = false; }, 5000);
     }
   }, []);
 
   const next = useCallback(() => {
-    goTo(currentIndexRef.current + 1);
-  }, [goTo]);
+    const nextIndex = currentIndexRef.current + 1;
+    if (nextIndex >= videoIdsRef.current.length) return;
+    historyRef.current.push(nextIndex);
+    navigateTo(nextIndex);
+  }, [navigateTo]);
 
   const prev = useCallback(() => {
-    goTo(currentIndexRef.current - 1);
-  }, [goTo]);
+    if (historyRef.current.length <= 1) return; // at first video, nothing to go back to
+    historyRef.current.pop(); // remove current
+    const prevIndex = historyRef.current[historyRef.current.length - 1];
+    navigateTo(prevIndex);
+  }, [navigateTo]);
 
   const toggleMute = useCallback(() => {
     if (playerRef.current) {
@@ -247,6 +255,7 @@ const Player = forwardRef<PlayerHandle, PlayerProps>(function Player({ videoIds,
       });
       currentIndexRef.current = 0;
       setCurrentIndex(0);
+      historyRef.current = [0];
       setMuted(mutedRef.current);
     };
 
