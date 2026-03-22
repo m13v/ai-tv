@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useRef, useEffect } from "react";
+import { useState, useCallback, useRef, useEffect, useMemo } from "react";
 import posthog from "posthog-js";
 import Player, { type PlayerHandle } from "@/components/Player";
 import Chat from "@/components/Chat";
@@ -20,6 +20,8 @@ export default function Home() {
   const [watchingVideo, setWatchingVideo] = useState(false);
   const [model, setModel] = useState<"gemini-flash-latest" | "gemini-pro-latest">("gemini-flash-latest");
   const [mobileOverlay, setMobileOverlay] = useState(true);
+  const lastSearchQueryRef = useRef<string>("");
+  const videoIdSetRef = useRef<Set<string>>(new Set());
   const [showControls, setShowControls] = useState(true);
   const [muted, setMuted] = useState(true);
   const playerRef = useRef<PlayerHandle | null>(null);
@@ -87,6 +89,8 @@ export default function Home() {
         const { videoIds: ids } = await searchRes.json();
 
         if (ids?.length > 0) {
+          lastSearchQueryRef.current = searchQuery;
+          videoIdSetRef.current = new Set(ids);
           setVideoIds(ids);
           posthog.capture("videos_loaded", {
             search_query: searchQuery,
@@ -144,6 +148,8 @@ export default function Home() {
               });
               const { videoIds: retryIds } = await retryRes.json();
               if (retryIds?.length > 0) {
+                lastSearchQueryRef.current = followUpQuery;
+                videoIdSetRef.current = new Set(retryIds);
                 setVideoIds(retryIds);
                 posthog.capture("video_retry", {
                   original_query: searchQuery,
