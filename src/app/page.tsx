@@ -49,6 +49,9 @@ export default function Home() {
     setLoading(true);
 
     const isFirstQuery = !hasStarted;
+    if (isFirstQuery) {
+      posthog.capture("session_started");
+    }
     setHasStarted(true);
     setSuggestedReplies([]);
 
@@ -248,6 +251,7 @@ export default function Home() {
   const handleQuickReply = useCallback(
     (reply: string) => {
       setInput(reply);
+      posthog.capture("quick_reply_selected", { reply });
       sendMessage(reply);
     },
     [sendMessage]
@@ -298,6 +302,11 @@ export default function Home() {
     setIsDragging(true);
   }, []);
 
+  const handleModelChange = useCallback((newModel: "gemini-flash-latest" | "gemini-pro-latest") => {
+    setModel(newModel);
+    posthog.capture("model_changed", { model: newModel === "gemini-flash-latest" ? "flash" : "pro" });
+  }, []);
+
   const quickQueries = [
     "How robots learn to walk",
     "Space footage from James Webb telescope",
@@ -313,6 +322,7 @@ export default function Home() {
 
   const handleQuickQuery = (query: string) => {
     setInput(query);
+    posthog.capture("quick_query_selected", { query });
     // Trigger send on next tick after state update
     setTimeout(() => {
       const form = document.querySelector("form");
@@ -324,6 +334,7 @@ export default function Home() {
     setMobileOverlay((prev) => {
       const next = !prev;
       localStorage.setItem("mobileOverlay", String(next));
+      posthog.capture("layout_toggle", { layout: next ? "overlay" : "split" });
       return next;
     });
   }, []);
@@ -455,6 +466,7 @@ export default function Home() {
             <div className="absolute right-3 top-[calc(0.75rem+env(safe-area-inset-top))] z-30 flex flex-col gap-2 md:hidden">
               <button
                 onClick={() => {
+                  posthog.capture("new_session", { previous_message_count: messages.length, previous_video_count: videoIds.length });
                   setHasStarted(false);
                   setMessages([]);
                   setVideoIds([]);
@@ -481,7 +493,7 @@ export default function Home() {
                 </svg>
               </button>
               <button
-                onClick={() => setShowControls(false)}
+                onClick={() => { setShowControls(false); posthog.capture("overlay_visibility_toggle", { visible: false }); }}
                 className="w-9 h-9 flex items-center justify-center rounded-full bg-black/40 backdrop-blur-sm text-white/60 hover:text-white hover:bg-black/60 transition-all cursor-pointer"
                 aria-label="Hide overlay"
               >
@@ -568,7 +580,7 @@ export default function Home() {
         {/* Mobile overlay: eye button when controls are hidden */}
         {mobileOverlay && !showControls && (
           <button
-            onClick={() => setShowControls(true)}
+            onClick={() => { setShowControls(true); posthog.capture("overlay_visibility_toggle", { visible: true }); }}
             className="absolute right-3 top-[calc(0.75rem+env(safe-area-inset-top))] z-30 w-9 h-9 flex items-center justify-center rounded-full bg-black/40 backdrop-blur-sm text-white/60 hover:text-white hover:bg-black/60 transition-all cursor-pointer md:hidden"
             aria-label="Show overlay"
           >
@@ -667,7 +679,7 @@ export default function Home() {
             suggestedReplies={suggestedReplies}
             onQuickReply={handleQuickReply}
             model={model}
-            onModelChange={setModel}
+            onModelChange={handleModelChange}
             watchingVideo={watchingVideo}
             overlay
           />
@@ -681,6 +693,7 @@ export default function Home() {
           <div className="absolute right-3 top-3 z-10 flex gap-2">
             <button
               onClick={() => {
+                posthog.capture("new_session", { previous_message_count: messages.length, previous_video_count: videoIds.length });
                 setHasStarted(false);
                 setMessages([]);
                 setVideoIds([]);
@@ -731,7 +744,7 @@ export default function Home() {
             suggestedReplies={suggestedReplies}
             onQuickReply={handleQuickReply}
             model={model}
-            onModelChange={setModel}
+            onModelChange={handleModelChange}
             watchingVideo={watchingVideo}
           />
         </div>
@@ -748,18 +761,18 @@ export default function Home() {
           suggestedReplies={suggestedReplies}
           onQuickReply={handleQuickReply}
           model={model}
-          onModelChange={setModel}
+          onModelChange={handleModelChange}
           watchingVideo={watchingVideo}
         />
       </div>
 
       {/* Report modal */}
       {showReport && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4" onClick={() => { setShowReport(false); setReportStatus("idle"); }}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4" onClick={() => { setShowReport(false); setReportStatus("idle"); posthog.capture("report_closed", { method: "backdrop" }); }}>
           <div className="bg-neutral-900 border border-neutral-700 rounded-2xl w-full max-w-sm p-5 flex flex-col gap-4" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between">
               <h2 className="text-white font-semibold text-lg">Report / Feedback</h2>
-              <button onClick={() => { setShowReport(false); setReportStatus("idle"); }} className="text-white/40 hover:text-white transition-colors cursor-pointer">
+              <button onClick={() => { setShowReport(false); setReportStatus("idle"); posthog.capture("report_closed", { method: "button" }); }} className="text-white/40 hover:text-white transition-colors cursor-pointer">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
                 </svg>
