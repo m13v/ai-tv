@@ -42,7 +42,7 @@ export default function Home() {
   useEffect(() => {
     if (!autoStarted.current) {
       autoStarted.current = true;
-      sendMessage("time lapse videos of people working");
+      sendMessage("programmer coding time lapse");
     }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
