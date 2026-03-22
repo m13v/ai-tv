@@ -398,114 +398,8 @@ export default function Home() {
       }`}
       style={{ "--split": `${splitPercent}%` } as React.CSSProperties}
     >
-      {/* Mobile overlay: control buttons — vertical column on right side, above nav buttons */}
-      {mobileOverlay && (
-        <div className="absolute right-3 bottom-[calc(50%+4rem)] z-30 flex flex-col gap-2 md:hidden">
-          {showControls && (
-            <>
-              <button
-                onClick={() => {
-                  setHasStarted(false);
-                  setMessages([]);
-                  setVideoIds([]);
-                  setInput("");
-                  setSuggestedReplies([]);
-                  setWatchingVideo(false);
-                }}
-                className="w-9 h-9 flex items-center justify-center rounded-full bg-black/40 backdrop-blur-sm text-white/60 hover:text-white hover:bg-black/60 transition-all cursor-pointer"
-                aria-label="New session"
-              >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <line x1="12" y1="5" x2="12" y2="19" />
-                  <line x1="5" y1="12" x2="19" y2="12" />
-                </svg>
-              </button>
-              <button
-                onClick={() => playerRef.current?.toggleMute()}
-                className="w-9 h-9 flex items-center justify-center rounded-full bg-black/40 backdrop-blur-sm text-white/60 hover:text-white hover:bg-black/60 transition-all cursor-pointer"
-                aria-label={muted ? "Unmute" : "Mute"}
-              >
-                {muted ? (
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
-                    <line x1="23" y1="9" x2="17" y2="15" />
-                    <line x1="17" y1="9" x2="23" y2="15" />
-                  </svg>
-                ) : (
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
-                    <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
-                    <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
-                  </svg>
-                )}
-              </button>
-              <button
-                onClick={toggleMobileLayout}
-                className="w-9 h-9 flex items-center justify-center rounded-full bg-black/40 backdrop-blur-sm text-white/60 hover:text-white hover:bg-black/60 transition-all cursor-pointer"
-                aria-label="Switch to split view"
-              >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <rect x="3" y="3" width="18" height="18" rx="2" />
-                  <line x1="3" y1="12" x2="21" y2="12" />
-                </svg>
-              </button>
-            </>
-          )}
-          <button
-            onClick={() => setShowControls((v) => !v)}
-            className="w-9 h-9 flex items-center justify-center rounded-full bg-black/40 backdrop-blur-sm text-white/60 hover:text-white hover:bg-black/60 transition-all cursor-pointer"
-            aria-label={showControls ? "Hide overlay" : "Show overlay"}
-          >
-            {showControls ? (
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94" />
-                <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19" />
-                <line x1="1" y1="1" x2="23" y2="23" />
-              </svg>
-            ) : (
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-                <circle cx="12" cy="12" r="3" />
-              </svg>
-            )}
-          </button>
-        </div>
-      )}
-      {/* Mobile split mode: control buttons — vertical column on right side */}
-      {!mobileOverlay && (
-        <div className="absolute right-3 bottom-[calc(50%+4rem)] z-30 flex flex-col gap-2 md:hidden">
-          <button
-            onClick={() => {
-              setHasStarted(false);
-              setMessages([]);
-              setVideoIds([]);
-              setInput("");
-              setSuggestedReplies([]);
-              setWatchingVideo(false);
-            }}
-            className="w-9 h-9 flex items-center justify-center rounded-full bg-black/40 backdrop-blur-sm text-white/60 hover:text-white hover:bg-black/60 transition-all cursor-pointer"
-            aria-label="New session"
-          >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <line x1="12" y1="5" x2="12" y2="19" />
-              <line x1="5" y1="12" x2="19" y2="12" />
-            </svg>
-          </button>
-          <button
-            onClick={toggleMobileLayout}
-            className="w-9 h-9 flex items-center justify-center rounded-full bg-black/40 backdrop-blur-sm text-white/60 hover:text-white hover:bg-black/60 transition-all cursor-pointer"
-            aria-label="Switch to overlay view"
-          >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <rect x="3" y="3" width="18" height="18" rx="2" />
-              <rect x="8" y="8" width="13" height="13" rx="1" />
-            </svg>
-          </button>
-        </div>
-      )}
-
       {/* Video */}
-      <div className={`md:relative md:overflow-hidden md:order-2 md:min-h-0 md:min-w-0 split-video-desktop ${
+      <div className={`relative md:overflow-hidden md:order-2 md:min-h-0 md:min-w-0 split-video-desktop ${
         mobileOverlay
           ? "absolute inset-0"
           : "overflow-hidden order-1 min-h-0 min-w-0 split-video-mobile"
@@ -516,6 +410,90 @@ export default function Home() {
           <div className="w-full h-full flex items-center justify-center text-neutral-400">
             Loading video...
           </div>
+        )}
+        {/* Mobile control buttons — vertical column on right side, above nav buttons */}
+        {(!mobileOverlay || showControls) && (
+          <div className="absolute right-3 bottom-[calc(50%+4rem)] z-30 flex flex-col gap-2 md:hidden">
+            <button
+              onClick={() => {
+                setHasStarted(false);
+                setMessages([]);
+                setVideoIds([]);
+                setInput("");
+                setSuggestedReplies([]);
+                setWatchingVideo(false);
+              }}
+              className="w-9 h-9 flex items-center justify-center rounded-full bg-black/40 backdrop-blur-sm text-white/60 hover:text-white hover:bg-black/60 transition-all cursor-pointer"
+              aria-label="New session"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="12" y1="5" x2="12" y2="19" />
+                <line x1="5" y1="12" x2="19" y2="12" />
+              </svg>
+            </button>
+            <button
+              onClick={() => playerRef.current?.toggleMute()}
+              className="w-9 h-9 flex items-center justify-center rounded-full bg-black/40 backdrop-blur-sm text-white/60 hover:text-white hover:bg-black/60 transition-all cursor-pointer"
+              aria-label={muted ? "Unmute" : "Mute"}
+            >
+              {muted ? (
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+                  <line x1="23" y1="9" x2="17" y2="15" />
+                  <line x1="17" y1="9" x2="23" y2="15" />
+                </svg>
+              ) : (
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+                  <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
+                  <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
+                </svg>
+              )}
+            </button>
+            <button
+              onClick={toggleMobileLayout}
+              className="w-9 h-9 flex items-center justify-center rounded-full bg-black/40 backdrop-blur-sm text-white/60 hover:text-white hover:bg-black/60 transition-all cursor-pointer"
+              aria-label={mobileOverlay ? "Switch to split view" : "Switch to overlay view"}
+            >
+              {mobileOverlay ? (
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="3" y="3" width="18" height="18" rx="2" />
+                  <line x1="3" y1="12" x2="21" y2="12" />
+                </svg>
+              ) : (
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="3" y="3" width="18" height="18" rx="2" />
+                  <rect x="8" y="8" width="13" height="13" rx="1" />
+                </svg>
+              )}
+            </button>
+            {mobileOverlay && (
+              <button
+                onClick={() => setShowControls((v) => !v)}
+                className="w-9 h-9 flex items-center justify-center rounded-full bg-black/40 backdrop-blur-sm text-white/60 hover:text-white hover:bg-black/60 transition-all cursor-pointer"
+                aria-label="Hide overlay"
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94" />
+                  <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19" />
+                  <line x1="1" y1="1" x2="23" y2="23" />
+                </svg>
+              </button>
+            )}
+          </div>
+        )}
+        {/* Mobile overlay: eye button when controls are hidden */}
+        {mobileOverlay && !showControls && (
+          <button
+            onClick={() => setShowControls(true)}
+            className="absolute right-3 bottom-[calc(50%+4rem)] z-30 w-9 h-9 flex items-center justify-center rounded-full bg-black/40 backdrop-blur-sm text-white/60 hover:text-white hover:bg-black/60 transition-all cursor-pointer md:hidden"
+            aria-label="Show overlay"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+              <circle cx="12" cy="12" r="3" />
+            </svg>
+          </button>
         )}
       </div>
 
