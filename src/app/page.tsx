@@ -323,7 +323,7 @@ export default function Home() {
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   placeholder="What do you want to watch?"
-                  className="w-full bg-neutral-900/80 backdrop-blur border border-neutral-700 rounded-full px-6 py-4 pr-20 text-white placeholder-neutral-400 focus:outline-none focus:border-neutral-500 text-lg"
+                  className="w-full bg-neutral-900/80 backdrop-blur border border-neutral-700 rounded-full px-6 py-4 md:pr-20 text-white placeholder-neutral-400 focus:outline-none focus:border-neutral-500 text-lg"
                   autoFocus
                 />
                 <div className="absolute right-3 top-1/2 -translate-y-1/2 items-center gap-0.5 pointer-events-none hidden md:flex">
