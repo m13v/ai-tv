@@ -5,6 +5,7 @@ import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useSta
 interface PlayerProps {
   videoIds: string[];
   onVideoChange?: (videoId: string, index: number) => void;
+  onNearEnd?: () => void;
   hideControls?: boolean;
   onMuteChange?: (muted: boolean) => void;
 }
@@ -52,7 +53,7 @@ interface YTPlayer {
   destroy: () => void;
 }
 
-const Player = forwardRef<PlayerHandle, PlayerProps>(function Player({ videoIds, onVideoChange, hideControls, onMuteChange }, ref) {
+const Player = forwardRef<PlayerHandle, PlayerProps>(function Player({ videoIds, onVideoChange, onNearEnd, hideControls, onMuteChange }, ref) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [muted, setMuted] = useState(true);
   const mutedRef = useRef(true);
@@ -73,16 +74,26 @@ const Player = forwardRef<PlayerHandle, PlayerProps>(function Player({ videoIds,
 
   const onVideoChangeRef = useRef(onVideoChange);
   onVideoChangeRef.current = onVideoChange;
+  const onNearEndRef = useRef(onNearEnd);
+  onNearEndRef.current = onNearEnd;
+  const fetchingMoreRef = useRef(false);
 
   const goTo = useCallback((index: number) => {
     const len = videoIdsRef.current.length;
-    if (len === 0) return;
-    const wrapped = ((index % len) + len) % len;
-    if (wrapped === currentIndexRef.current) return;
-    playerRef.current?.loadVideoById(videoIdsRef.current[wrapped]);
-    currentIndexRef.current = wrapped;
-    setCurrentIndex(wrapped);
-    onVideoChangeRef.current?.(videoIdsRef.current[wrapped], wrapped);
+    if (len === 0 || index < 0 || index >= len) return;
+    if (index === currentIndexRef.current) return;
+    playerRef.current?.loadVideoById(videoIdsRef.current[index]);
+    currentIndexRef.current = index;
+    setCurrentIndex(index);
+    onVideoChangeRef.current?.(videoIdsRef.current[index], index);
+
+    // Fetch more when within 3 of the end
+    if (index >= len - 3 && !fetchingMoreRef.current) {
+      fetchingMoreRef.current = true;
+      onNearEndRef.current?.();
+      // Reset after a delay to allow re-triggering
+      setTimeout(() => { fetchingMoreRef.current = false; }, 5000);
+    }
   }, []);
 
   const next = useCallback(() => {
