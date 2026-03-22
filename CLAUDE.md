@@ -26,6 +26,13 @@ Next.js app (v15, Turbopack) — AI-powered YouTube video discovery with chat.
 - Uses `dvh` units and `env(safe-area-inset-top)` for mobile browser chrome
 - `viewport-fit: cover` enabled in layout.tsx
 
+## Deployment
+
+- **Production**: `git tag vX.Y.Z && git push origin vX.Y.Z` → https://vidq.tv
+- **Staging**: Push to `main` → https://staging-vidq.vercel.app (persistent alias)
+- CI/CD via GitHub Actions (`.github/workflows/deploy.yml`), Vercel git integration disabled (`vercel.json`)
+- Vercel Authentication is off — preview URLs are publicly accessible
+
 ## Common Gotchas
 
 - Never put CSS comments (`/* */`) inside JSX className template literals — they become literal class names
