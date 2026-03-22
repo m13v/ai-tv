@@ -15,8 +15,8 @@ interface PlayerProps {
 export interface PlayerHandle {
   toggleMute: () => void;
   togglePlay: () => void;
-  next: () => void;
-  prev: () => void;
+  next: (source?: string) => void;
+  prev: (source?: string) => void;
 }
 
 declare global {
