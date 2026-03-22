@@ -399,10 +399,10 @@ export default function Home() {
       style={{ "--split": `${splitPercent}%` } as React.CSSProperties}
     >
       {/* Video */}
-      <div className={`relative md:overflow-hidden md:order-2 md:min-h-0 md:min-w-0 split-video-desktop ${
+      <div className={`md:relative md:overflow-hidden md:order-2 md:min-h-0 md:min-w-0 split-video-desktop ${
         mobileOverlay
           ? "absolute inset-0"
-          : "overflow-hidden order-1 min-h-0 min-w-0 split-video-mobile"
+          : "relative overflow-hidden order-1 min-h-0 min-w-0 split-video-mobile"
       }`}>
         {videoIds.length > 0 ? (
           <Player ref={playerRef} videoIds={videoIds} onVideoChange={handleVideoChange} onNearEnd={fetchMoreVideos} hideControls={mobileOverlay && !showControls} onMuteChange={setMuted} />
