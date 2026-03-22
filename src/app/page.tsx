@@ -398,114 +398,110 @@ export default function Home() {
       }`}
       style={{ "--split": `${splitPercent}%` } as React.CSSProperties}
     >
-      {/* Mobile: eye button — always visible in overlay mode, toggles entire overlay */}
+      {/* Mobile overlay: control buttons — vertical column on right side, above nav buttons */}
       {mobileOverlay && (
-        <button
-          onClick={() => setShowControls((v) => !v)}
-          className="absolute top-[calc(0.75rem+env(safe-area-inset-top))] left-3 z-30 w-9 h-9 flex items-center justify-center rounded-full bg-black/40 backdrop-blur-sm text-white/60 hover:text-white hover:bg-black/60 transition-all cursor-pointer md:hidden"
-          aria-label={showControls ? "Hide overlay" : "Show overlay"}
-        >
-          {showControls ? (
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94" />
-              <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19" />
-              <line x1="1" y1="1" x2="23" y2="23" />
-            </svg>
-          ) : (
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-              <circle cx="12" cy="12" r="3" />
-            </svg>
+        <div className="absolute right-3 bottom-[calc(50%+4rem)] z-30 flex flex-col gap-2 md:hidden">
+          {showControls && (
+            <>
+              <button
+                onClick={() => {
+                  setHasStarted(false);
+                  setMessages([]);
+                  setVideoIds([]);
+                  setInput("");
+                  setSuggestedReplies([]);
+                  setWatchingVideo(false);
+                }}
+                className="w-9 h-9 flex items-center justify-center rounded-full bg-black/40 backdrop-blur-sm text-white/60 hover:text-white hover:bg-black/60 transition-all cursor-pointer"
+                aria-label="New session"
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="12" y1="5" x2="12" y2="19" />
+                  <line x1="5" y1="12" x2="19" y2="12" />
+                </svg>
+              </button>
+              <button
+                onClick={() => playerRef.current?.toggleMute()}
+                className="w-9 h-9 flex items-center justify-center rounded-full bg-black/40 backdrop-blur-sm text-white/60 hover:text-white hover:bg-black/60 transition-all cursor-pointer"
+                aria-label={muted ? "Unmute" : "Mute"}
+              >
+                {muted ? (
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+                    <line x1="23" y1="9" x2="17" y2="15" />
+                    <line x1="17" y1="9" x2="23" y2="15" />
+                  </svg>
+                ) : (
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+                    <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
+                    <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
+                  </svg>
+                )}
+              </button>
+              <button
+                onClick={toggleMobileLayout}
+                className="w-9 h-9 flex items-center justify-center rounded-full bg-black/40 backdrop-blur-sm text-white/60 hover:text-white hover:bg-black/60 transition-all cursor-pointer"
+                aria-label="Switch to split view"
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="3" y="3" width="18" height="18" rx="2" />
+                  <line x1="3" y1="12" x2="21" y2="12" />
+                </svg>
+              </button>
+            </>
           )}
-        </button>
+          <button
+            onClick={() => setShowControls((v) => !v)}
+            className="w-9 h-9 flex items-center justify-center rounded-full bg-black/40 backdrop-blur-sm text-white/60 hover:text-white hover:bg-black/60 transition-all cursor-pointer"
+            aria-label={showControls ? "Hide overlay" : "Show overlay"}
+          >
+            {showControls ? (
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94" />
+                <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19" />
+                <line x1="1" y1="1" x2="23" y2="23" />
+              </svg>
+            ) : (
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                <circle cx="12" cy="12" r="3" />
+              </svg>
+            )}
+          </button>
+        </div>
       )}
-      {/* Mobile: layout toggle — only visible when overlay is showing */}
-      {mobileOverlay && showControls && (
-        <button
-          onClick={toggleMobileLayout}
-          className="absolute top-[calc(0.75rem+env(safe-area-inset-top))] left-14 z-30 w-9 h-9 flex items-center justify-center rounded-full bg-black/40 backdrop-blur-sm text-white/60 hover:text-white hover:bg-black/60 transition-all cursor-pointer md:hidden"
-          aria-label={mobileOverlay ? "Switch to split view" : "Switch to overlay view"}
-        >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <rect x="3" y="3" width="18" height="18" rx="2" />
-            <line x1="3" y1="12" x2="21" y2="12" />
-          </svg>
-        </button>
-      )}
-      {/* Mobile: mute button — in line with top-left buttons */}
-      {mobileOverlay && showControls && (
-        <button
-          onClick={() => playerRef.current?.toggleMute()}
-          className="absolute top-[calc(0.75rem+env(safe-area-inset-top))] left-[6.25rem] z-30 w-9 h-9 flex items-center justify-center rounded-full bg-black/40 backdrop-blur-sm text-white/60 hover:text-white hover:bg-black/60 transition-all cursor-pointer md:hidden"
-          aria-label={muted ? "Unmute" : "Mute"}
-        >
-          {muted ? (
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
-              <line x1="23" y1="9" x2="17" y2="15" />
-              <line x1="17" y1="9" x2="23" y2="15" />
-            </svg>
-          ) : (
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
-              <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
-              <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
-            </svg>
-          )}
-        </button>
-      )}
-      {/* Mobile: new session button — in line with top-left buttons (overlay mode) */}
-      {mobileOverlay && showControls && (
-        <button
-          onClick={() => {
-            setHasStarted(false);
-            setMessages([]);
-            setVideoIds([]);
-            setInput("");
-            setSuggestedReplies([]);
-            setWatchingVideo(false);
-          }}
-          className="absolute top-[calc(0.75rem+env(safe-area-inset-top))] left-[9rem] z-30 w-9 h-9 flex items-center justify-center rounded-full bg-black/40 backdrop-blur-sm text-white/60 hover:text-white hover:bg-black/60 transition-all cursor-pointer md:hidden"
-          aria-label="New session"
-        >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <line x1="12" y1="5" x2="12" y2="19" />
-            <line x1="5" y1="12" x2="19" y2="12" />
-          </svg>
-        </button>
-      )}
-      {/* Mobile: layout toggle in split mode */}
+      {/* Mobile split mode: control buttons — vertical column on right side */}
       {!mobileOverlay && (
-        <button
-          onClick={toggleMobileLayout}
-          className="absolute top-[calc(0.75rem+env(safe-area-inset-top))] left-3 z-30 w-9 h-9 flex items-center justify-center rounded-full bg-black/40 backdrop-blur-sm text-white/60 hover:text-white hover:bg-black/60 transition-all cursor-pointer md:hidden"
-          aria-label="Switch to overlay view"
-        >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <rect x="3" y="3" width="18" height="18" rx="2" />
-            <rect x="8" y="8" width="13" height="13" rx="1" />
-          </svg>
-        </button>
-      )}
-      {/* Mobile: new session button in split mode */}
-      {!mobileOverlay && (
-        <button
-          onClick={() => {
-            setHasStarted(false);
-            setMessages([]);
-            setVideoIds([]);
-            setInput("");
-            setSuggestedReplies([]);
-            setWatchingVideo(false);
-          }}
-          className="absolute top-[calc(0.75rem+env(safe-area-inset-top))] left-14 z-30 w-9 h-9 flex items-center justify-center rounded-full bg-black/40 backdrop-blur-sm text-white/60 hover:text-white hover:bg-black/60 transition-all cursor-pointer md:hidden"
-          aria-label="New session"
-        >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <line x1="12" y1="5" x2="12" y2="19" />
-            <line x1="5" y1="12" x2="19" y2="12" />
-          </svg>
-        </button>
+        <div className="absolute right-3 bottom-[calc(50%+4rem)] z-30 flex flex-col gap-2 md:hidden">
+          <button
+            onClick={() => {
+              setHasStarted(false);
+              setMessages([]);
+              setVideoIds([]);
+              setInput("");
+              setSuggestedReplies([]);
+              setWatchingVideo(false);
+            }}
+            className="w-9 h-9 flex items-center justify-center rounded-full bg-black/40 backdrop-blur-sm text-white/60 hover:text-white hover:bg-black/60 transition-all cursor-pointer"
+            aria-label="New session"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="12" y1="5" x2="12" y2="19" />
+              <line x1="5" y1="12" x2="19" y2="12" />
+            </svg>
+          </button>
+          <button
+            onClick={toggleMobileLayout}
+            className="w-9 h-9 flex items-center justify-center rounded-full bg-black/40 backdrop-blur-sm text-white/60 hover:text-white hover:bg-black/60 transition-all cursor-pointer"
+            aria-label="Switch to overlay view"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="3" y="3" width="18" height="18" rx="2" />
+              <rect x="8" y="8" width="13" height="13" rx="1" />
+            </svg>
+          </button>
+        </div>
       )}
 
       {/* Video */}
