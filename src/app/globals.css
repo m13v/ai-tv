@@ -55,6 +55,10 @@ html, body {
 }
 
 /* Text shadow for overlay chat readability */
+.touch-action-pan-y {
+  touch-action: pan-y;
+}
+
 .text-shadow-sm {
   text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8), 0 0 8px rgba(0, 0, 0, 0.5);
 }
