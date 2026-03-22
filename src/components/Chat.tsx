@@ -231,7 +231,7 @@ export default function Chat({
               e.preventDefault();
               onSubmit();
             }}
-            className="flex gap-2"
+            className="flex gap-2 items-end"
           >
             <div className="relative flex-1">
               <textarea
@@ -251,7 +251,7 @@ export default function Chat({
                     ? "bg-black/50 backdrop-blur-md border border-white/20 focus:border-white/40"
                     : "bg-neutral-900 border border-neutral-700 focus:border-neutral-600"
                 }`}
-                style={{ maxHeight: "calc(15 * 1.625em)" }}
+                style={{ maxHeight: "calc(15 * 1.625em)", overflowY: "auto" }}
                 disabled={loading}
                 autoFocus={false}
               />
