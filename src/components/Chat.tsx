@@ -252,7 +252,7 @@ export default function Chat({
                   }
                 }}
                 placeholder="What do you want to watch?"
-                className={`w-full rounded-2xl px-4 py-[10px] md:pr-16 text-white placeholder-neutral-400 focus:outline-none text-xs resize-none leading-5 scrollbar-none ${
+                className={`block w-full rounded-2xl px-4 py-[10px] md:pr-16 text-white placeholder-neutral-400 focus:outline-none text-xs resize-none leading-5 scrollbar-none ${
                   overlay
                     ? "bg-black/50 backdrop-blur-md border border-white/20 focus:border-white/40"
                     : "bg-neutral-900 border border-neutral-700 focus:border-neutral-600"
