@@ -246,9 +246,9 @@ export default function Chat({
                     onSubmit();
                   }
                 }}
-                placeholder="Ask something or describe what to watch next..."
+                placeholder="What do you want to watch?"
                 rows={1}
-                className={`w-full rounded-2xl px-4 py-3.5 md:py-2.5 md:pr-16 text-white placeholder-neutral-400 focus:outline-none text-xs resize-none leading-5 scrollbar-none ${
+                className={`w-full rounded-2xl px-4 py-2.5 md:pr-16 text-white placeholder-neutral-400 focus:outline-none text-xs resize-none leading-5 scrollbar-none ${
                   overlay
                     ? "bg-black/50 backdrop-blur-md border border-white/20 focus:border-white/40"
                     : "bg-neutral-900 border border-neutral-700 focus:border-neutral-600"
