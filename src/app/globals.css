@@ -71,3 +71,8 @@ html, body {
 .animate-fade-out {
   animation: fade-out 4s ease-out forwards;
 }
+
+@keyframes swipeHand {
+  0%, 100% { transform: translateY(8px); }
+  50% { transform: translateY(-8px); }
+}
