@@ -99,9 +99,12 @@ export default function Chat({
   useEffect(() => {
     const el = inputRef.current;
     if (!el) return;
+    // Reset to min height, then check if content needs more
     el.style.height = "40px";
+    el.style.overflow = "hidden";
     if (el.scrollHeight > 40) {
       el.style.height = `${el.scrollHeight}px`;
+      el.style.overflow = "auto";
     }
   }, [input]);
 
@@ -249,13 +252,12 @@ export default function Chat({
                   }
                 }}
                 placeholder="What do you want to watch?"
-                rows={1}
                 className={`w-full rounded-2xl px-4 py-[10px] md:pr-16 text-white placeholder-neutral-400 focus:outline-none text-xs resize-none leading-5 scrollbar-none ${
                   overlay
                     ? "bg-black/50 backdrop-blur-md border border-white/20 focus:border-white/40"
                     : "bg-neutral-900 border border-neutral-700 focus:border-neutral-600"
                 }`}
-                style={{ maxHeight: "calc(15 * 1.25rem + 1.25rem)", overflowY: "auto" }}
+                style={{ height: "40px", maxHeight: "calc(15 * 1.25rem + 1.25rem)", overflow: "hidden" }}
                 disabled={loading}
                 autoFocus={false}
               />
