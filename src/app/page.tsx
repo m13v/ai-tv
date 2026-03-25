@@ -32,11 +32,15 @@ export default function Home() {
   const [reportFeedback, setReportFeedback] = useState("");
   const [reportEmail, setReportEmail] = useState("");
   const [reportStatus, setReportStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
+  const [showSwipeHint, setShowSwipeHint] = useState(false);
 
-  // Load mobile layout preference
+  // Load mobile layout preference + check if first-time user for swipe hint
   useEffect(() => {
     const saved = localStorage.getItem("mobileOverlay");
     if (saved !== null) setMobileOverlay(saved === "true");
+    if (!localStorage.getItem("swipeHintSeen")) {
+      setShowSwipeHint(true);
+    }
   }, []);
 
   const sendMessage = useCallback(async (overrideInput?: string) => {
@@ -681,6 +685,43 @@ export default function Home() {
           onTouchStart={handleOverlayTouchStart}
           onTouchEnd={handleOverlayTouchEnd}
         />
+      )}
+
+      {/* Swipe hint for first-time mobile users */}
+      {mobileOverlay && showSwipeHint && videoIds.length > 0 && (
+        <div
+          className="absolute inset-0 z-40 md:hidden flex items-center justify-center bg-black/50 backdrop-blur-sm"
+          onClick={() => {
+            setShowSwipeHint(false);
+            localStorage.setItem("swipeHintSeen", "true");
+          }}
+          onTouchEnd={() => {
+            setShowSwipeHint(false);
+            localStorage.setItem("swipeHintSeen", "true");
+          }}
+        >
+          <div className="flex flex-col items-center gap-3 text-white/90 pointer-events-none">
+            {/* Up arrow bouncing */}
+            <svg className="w-8 h-8 animate-bounce" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="18 15 12 9 6 15" />
+            </svg>
+            {/* Hand/swipe icon */}
+            <div className="relative">
+              <svg className="w-12 h-12 animate-[swipeHand_1.5s_ease-in-out_infinite]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M18 11V6a2 2 0 0 0-4 0v5" />
+                <path d="M14 10V4a2 2 0 0 0-4 0v7" />
+                <path d="M10 10.5V6a2 2 0 0 0-4 0v8" />
+                <path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15" />
+              </svg>
+            </div>
+            <p className="text-sm font-medium">Swipe up or down</p>
+            <p className="text-xs text-white/60">to switch videos</p>
+            {/* Down arrow bouncing */}
+            <svg className="w-8 h-8 animate-bounce" style={{ animationDelay: "150ms" }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="6 9 12 15 18 9" />
+            </svg>
+          </div>
+        </div>
       )}
 
       {/* Mobile overlay chat — full height, transparent, video behind */}
