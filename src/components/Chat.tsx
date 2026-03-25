@@ -125,10 +125,10 @@ export default function Chat({
 
   return (
     <div className={`flex flex-col h-full ${overlay ? "pointer-events-none" : ""}`}>
-      {/* Messages */}
+      {/* Messages — hidden on mobile in overlay mode (swipe navigates videos instead) */}
       <div
         ref={messagesContainerRef}
-        className={`flex-1 overflow-y-auto px-4 py-4 space-y-4 ${overlay ? "pointer-events-auto touch-action-pan-y" : ""}`}
+        className={`flex-1 overflow-y-auto px-4 py-4 space-y-4 ${overlay ? "hidden md:block pointer-events-auto touch-action-pan-y" : ""}`}
         onTouchStart={overlay ? handleTouchStart : undefined}
         onTouchEnd={overlay ? handleTouchEnd : undefined}
       >
@@ -185,6 +185,8 @@ export default function Chat({
         )}
         <div ref={messagesEndRef} />
       </div>
+      {/* Spacer on mobile overlay to push input to bottom (messages are hidden) */}
+      {overlay && <div className="flex-1 md:hidden" />}
 
       {/* Bottom: suggested replies + input — pushed up on mobile overlay to clear YouTube timeline */}
       <div className={overlay ? "pb-28" : ""}>
