@@ -34,6 +34,11 @@ export default function Home() {
   const [reportStatus, setReportStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
   const [showSwipeHint, setShowSwipeHint] = useState(false);
 
+  const dismissSwipeHint = useCallback(() => {
+    setShowSwipeHint(false);
+    localStorage.setItem("swipeHintSeen", "true");
+  }, []);
+
   // Load mobile layout preference + check if first-time user for swipe hint
   useEffect(() => {
     const saved = localStorage.getItem("mobileOverlay");
@@ -42,6 +47,13 @@ export default function Home() {
       setShowSwipeHint(true);
     }
   }, []);
+
+  // Auto-dismiss swipe hint after 3 seconds once videos are showing
+  useEffect(() => {
+    if (!showSwipeHint || videoIds.length === 0) return;
+    const timer = setTimeout(dismissSwipeHint, 3000);
+    return () => clearTimeout(timer);
+  }, [showSwipeHint, videoIds.length, dismissSwipeHint]);
 
   const sendMessage = useCallback(async (overrideInput?: string) => {
     const raw = overrideInput ?? input;
@@ -691,14 +703,8 @@ export default function Home() {
       {mobileOverlay && showSwipeHint && videoIds.length > 0 && (
         <div
           className="absolute inset-0 z-40 md:hidden flex items-center justify-center bg-black/50 backdrop-blur-sm"
-          onClick={() => {
-            setShowSwipeHint(false);
-            localStorage.setItem("swipeHintSeen", "true");
-          }}
-          onTouchEnd={() => {
-            setShowSwipeHint(false);
-            localStorage.setItem("swipeHintSeen", "true");
-          }}
+          onClick={dismissSwipeHint}
+          onTouchEnd={dismissSwipeHint}
         >
           <div className="flex flex-col items-center gap-3 text-white/90 pointer-events-none">
             {/* Up arrow bouncing */}
