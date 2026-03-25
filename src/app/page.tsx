@@ -27,6 +27,8 @@ export default function Home() {
   const [playing, setPlaying] = useState(false);
   const playerRef = useRef<PlayerHandle | null>(null);
   const [showReport, setShowReport] = useState(false);
+  // Swipe-to-navigate on mobile overlay
+  const swipeTouchRef = useRef<{ x: number; y: number; time: number } | null>(null);
   const [reportFeedback, setReportFeedback] = useState("");
   const [reportEmail, setReportEmail] = useState("");
   const [reportStatus, setReportStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
@@ -371,6 +373,26 @@ export default function Home() {
     }
   }, [reportFeedback, reportEmail, reportStatus, videoIds, messages.length]);
 
+  const handleOverlayTouchStart = useCallback((e: React.TouchEvent) => {
+    const touch = e.touches[0];
+    swipeTouchRef.current = { x: touch.clientX, y: touch.clientY, time: Date.now() };
+  }, []);
+
+  const handleOverlayTouchEnd = useCallback((e: React.TouchEvent) => {
+    if (!swipeTouchRef.current) return;
+    const touch = e.changedTouches[0];
+    const dy = touch.clientY - swipeTouchRef.current.y;
+    const dx = Math.abs(touch.clientX - swipeTouchRef.current.x);
+    const dt = Date.now() - swipeTouchRef.current.time;
+    swipeTouchRef.current = null;
+
+    // Vertical swipe: must exceed threshold, be mostly vertical, and quick
+    if (Math.abs(dy) > 50 && Math.abs(dy) > dx * 1.5 && dt < 500) {
+      if (dy < 0) playerRef.current?.next("swipe");
+      else playerRef.current?.prev("swipe");
+    }
+  }, []);
+
   // Landing page
   if (!hasStarted) {
     return (
@@ -519,17 +541,8 @@ export default function Home() {
                 </svg>
               </button>
             </div>
-            {/* Bottom group: play/pause, prev, next, mute */}
+            {/* Bottom group: play/pause, mute (prev/next replaced by swipe) */}
             <div className="absolute right-3 top-1/2 -translate-y-1/2 z-30 flex flex-col gap-2 md:hidden">
-              <button
-                onClick={() => playerRef.current?.prev()}
-                className="w-10 h-10 flex items-center justify-center rounded-full bg-black/50 backdrop-blur-sm border border-white/15 text-white/85 hover:text-white hover:bg-black/70 transition-all cursor-pointer"
-                aria-label="Previous video"
-              >
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <polyline points="18 15 12 9 6 15" />
-                </svg>
-              </button>
               <button
                 onClick={() => playerRef.current?.togglePlay()}
                 className="w-10 h-10 flex items-center justify-center rounded-full bg-black/50 backdrop-blur-sm border border-white/15 text-white/85 hover:text-white hover:bg-black/70 transition-all cursor-pointer"
@@ -545,15 +558,6 @@ export default function Home() {
                     <polygon points="6 3 20 12 6 21 6 3" />
                   </svg>
                 )}
-              </button>
-              <button
-                onClick={() => playerRef.current?.next()}
-                className="w-10 h-10 flex items-center justify-center rounded-full bg-black/50 backdrop-blur-sm border border-white/15 text-white/85 hover:text-white hover:bg-black/70 transition-all cursor-pointer"
-                aria-label="Next video"
-              >
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <polyline points="6 9 12 15 18 9" />
-                </svg>
               </button>
               <button
                 onClick={() => playerRef.current?.toggleMute()}
@@ -666,6 +670,15 @@ export default function Home() {
           }`}
         />
       </div>
+
+      {/* Mobile overlay: swipe capture layer for video navigation */}
+      {mobileOverlay && (
+        <div
+          className="absolute inset-0 z-10 md:hidden"
+          onTouchStart={handleOverlayTouchStart}
+          onTouchEnd={handleOverlayTouchEnd}
+        />
+      )}
 
       {/* Mobile overlay chat — full height, transparent, video behind */}
       {mobileOverlay && showControls && (
