@@ -386,27 +386,11 @@ export default function Home() {
     const dy = touch.clientY - swipeTouchRef.current.y;
     const dx = Math.abs(touch.clientX - swipeTouchRef.current.x);
     const dt = Date.now() - swipeTouchRef.current.time;
-    const startY = swipeTouchRef.current.y;
-    const endX = touch.clientX;
-    const endY = touch.clientY;
     swipeTouchRef.current = null;
 
-    // Vertical swipe: navigate videos
     if (Math.abs(dy) > 50 && Math.abs(dy) > dx * 1.5 && dt < 500) {
       if (dy < 0) playerRef.current?.next("swipe");
       else playerRef.current?.prev("swipe");
-      return;
-    }
-
-    // Tap (not a swipe): pass through to element below (YouTube controls)
-    if (Math.abs(dy) < 10 && dx < 10 && dt < 300) {
-      const el = swipeLayerRef.current;
-      if (el) {
-        el.style.pointerEvents = "none";
-        const below = document.elementFromPoint(endX, endY);
-        el.style.pointerEvents = "";
-        if (below) (below as HTMLElement).click();
-      }
     }
   }, []);
 
@@ -688,11 +672,12 @@ export default function Home() {
         />
       </div>
 
-      {/* Mobile overlay: swipe capture layer — swipes navigate videos, taps pass through to YouTube */}
+      {/* Mobile overlay: swipe capture layer — covers top 75% for swipe navigation, bottom 25% open for YouTube controls */}
       {mobileOverlay && (
         <div
           ref={swipeLayerRef}
-          className="absolute inset-0 z-10 md:hidden"
+          className="absolute inset-x-0 top-0 z-10 md:hidden"
+          style={{ height: "75%" }}
           onTouchStart={handleOverlayTouchStart}
           onTouchEnd={handleOverlayTouchEnd}
         />
