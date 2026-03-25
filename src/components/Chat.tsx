@@ -233,7 +233,7 @@ export default function Chat({
               e.preventDefault();
               onSubmit();
             }}
-            className="flex gap-2 items-end"
+            className="flex gap-2 items-center"
           >
             <div className="relative flex-1">
               <textarea
